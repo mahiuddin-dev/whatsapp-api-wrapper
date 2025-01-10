@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="whatsapp_api",
+    name="whatsapp_api_wrapper",
     version="0.1.0",
     description="Python wrapper for the Meta WhatsApp API",
     author="Md Mahiuddin",
