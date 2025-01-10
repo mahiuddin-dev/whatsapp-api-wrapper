@@ -3,6 +3,13 @@
 A Python wrapper for the Meta WhatsApp Business API. This package allows developers to interact with the WhatsApp Business API for sending messages, buttons, and list messages.
 
 
+## Documentation
+
+For detailed usage instructions, examples, and validation rules, check out the full documentation:
+
+- [View Documentation](./docs/index.md)
+
+
 ## Installation
 
 ### Clone the Repository
