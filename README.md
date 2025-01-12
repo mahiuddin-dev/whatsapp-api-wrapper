@@ -56,7 +56,7 @@ For detailed usage instructions, examples, and validation rules, check out the f
 ## Example: Sending a Text Message
 
    ```python
-   from whatsapp_api.messaging import MessagingClient
+   from whatsapp_api.Message.messaging import MessagingClient
    client = MessagingClient(access_token, phone_number_id)
    response = client.send_text_message(recipient_id, "Hello from WhatsApp API!")
    print("Response:", response)
