@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "whatsapp_api_wrapper"
+version = "0.1.0"
+description = "Python wrapper for the Meta WhatsApp API"
+readme = "README.md"
+readme-content-type = "text/markdown"
+authors = [{ name = "Md Mahiuddin", email = "dev.mahiuddin@gmail.com" }]
+license = { text = "MIT" }
+dependencies = [
+    "requests>=2.32.3"
+]
+keywords = ["whatsapp", "api", "wrapper"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+python-requires = ">=3.8"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -2,8 +2,9 @@ import os
 import sys
 import unittest
 from unittest.mock import patch, MagicMock
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
-from whatsapp_api.messaging import MessagingClient
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+
+from whatsapp_api.Message.messaging import MessagingClient
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -39,7 +40,39 @@ class TestMessagingClient(unittest.TestCase):
                 "messaging_product": "whatsapp",
                 "to": self.recipient_id,
                 "type": "text",
-                "text": {"body": "Hello, World!"},
+                "text": {
+                    'preview_url': False,
+                    "body": "Hello, World!"
+                },
+            },
+        )
+
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_reply_text_message(self, mock_request):
+        """Test replying to a text message."""
+        mock_request.return_value = {"success": True}
+
+        previous_message_id = "abc123"
+        message = "Thank you for your message!"
+
+        response = self.client.reply_text_message(self.recipient_id, message, previous_message_id)
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.phone_number_id}/messages",
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_id,
+                "context": {
+                    "message_id": previous_message_id
+                },
+                "type": "text",
+                "text": {
+                    "preview_url": False,
+                    "body": message
+                }
             },
         )
 

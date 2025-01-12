@@ -9,6 +9,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
 - [Sending a Text Message](#sending-a-text-message)
+- [Replying to a Text Message](#replying-to-a-text-message)
 - [Sending a Button Message](#sending-a-button-message)
 - [Validation Rules for Button Messages](#validation-rules-for-button-messages)
 - [Sending a List Message](#sending-a-list-message)
@@ -26,7 +27,7 @@ To send messages, you must initialize the `MessagingClient` class. The class req
 
 ### Example: Initialize the MessagingClient
 ```python
-from whatsapp_api.messaging import MessagingClient
+from whatsapp_api.Message.messaging import MessagingClient
 
 access_token = "your_access_token_here"
 phone_number_id = "your_phone_number_id_here"
@@ -49,6 +50,7 @@ send_text_message(recipient_id: str, message: str) -> dict
 ### Parameters
 - `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
 - `message` *(str)*: The text message content.
+- `preview_url` *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
 
 ### Example: Sending a Text Message
 ```python
@@ -59,6 +61,48 @@ message = "Hello from WhatsApp API!"
 response = client.send_text_message(recipient_id, message)
 print("Response:", response)
 ```
+
+---
+
+## Replying to a Text Message
+
+The `reply_text_message` method allows you to reply to a specific message in a WhatsApp conversation by referencing the message ID of the previous message.
+
+### Method Signature
+```python
+reply_text_message(recipient_id: str, message: str, previous_message_id: str, preview_url: bool = False) -> dict
+```
+
+### Parameters
+- `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
+- `message` *(str)*: The reply message content. Maximum length is 4096 characters.
+- `previous_message_id` *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
+- `preview_url` *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
+
+### Example: Replying to a Text Message
+```python
+recipient_id = "+1234567890"
+message = "Thank you for reaching out!"
+previous_message_id = "abc123"
+
+# Reply to a text message
+response = client.reply_text_message(
+    recipient_id=recipient_id,
+    message=message,
+    previous_message_id=previous_message_id
+)
+print("Response:", response)
+```
+
+### Notes
+- The method references the previous message in the conversation using the `previous_message_id`. This ensures that the reply is properly threaded.
+- The `preview_url` parameter enables link previews in the message body when set to **`True`**.
+
+---
+
+### Related Methods
+- [`send_text_message`](#sending-a-text-message): Use this method to send plain text messages without referencing a previous message.
+
 ---
 ## Sending a Button Message
 

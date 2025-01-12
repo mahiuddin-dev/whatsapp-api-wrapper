@@ -1,5 +1,5 @@
 from whatsapp_api.base_client import BaseClient
-from whatsapp_api.validation import validate_buttons, validate_list_message
+from whatsapp_api.Message.validation import validate_buttons, validate_list_message
 
 
 class MessagingClient(BaseClient):
@@ -13,12 +13,14 @@ class MessagingClient(BaseClient):
         super().__init__(access_token)
         self.endpoint = f"{phone_number_id}/messages"
 
-    def send_text_message(self, recipient_id, message):
+    # Send Text Message
+    def send_text_message(self, recipient_id, message, preview_url=False):
         """
         Send a text message.
 
         :param recipient_id: The recipient's WhatsApp number
-        :param message: The message content
+        :param message: The message content - Maximum 4096 characters.
+        :param preview_url: Preview URL render a link preview of any URL in the body text string. (optional)
         :return: API response JSON
         """
 
@@ -27,10 +29,43 @@ class MessagingClient(BaseClient):
             "messaging_product": "whatsapp",
             "to": recipient_id,
             "type": "text",
-            "text": {"body": message},
+            "text": {
+                "preview_url": preview_url, 
+                "body": message
+            },
         }
         return self._request("POST", self.endpoint, payload)
 
+    # Send Reply to Text Message
+    def reply_text_message(self, recipient_id, message, previous_message_id, preview_url=False):
+        """
+        Send a reply to a text message.
+
+        :param recipient_id: The recipient's WhatsApp number
+        :param message: The reply message content - Maximum 4096 characters.
+        :param previous_message_id: The ID of the previous message in the conversation.
+        :param preview_url: Preview URL render a link preview of any URL in the body text string. (optional)
+        :return: API response JSON
+        """
+
+        # Prepare the payload
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_id,
+            "context": {
+                "message_id": previous_message_id
+            },
+            "type": "text",
+            "text": {
+                "preview_url": preview_url,
+                "body": message
+            }
+        }
+
+        return self._request("POST", self.endpoint, payload)
+
+    # Send Interactive Message with Buttons
     def send_button_message(self, recipient_id, text, buttons):
         """
         Send an interactive button message.
@@ -56,6 +91,7 @@ class MessagingClient(BaseClient):
         }
         return self._request("POST", self.endpoint, payload)
 
+    # Send Interactive List Message with Header and Footer
     def send_list_message(self, recipient_id, body_text, sections, button_cta, header_text=None, footer_text=None):
         """
         Send an interactive list message.
