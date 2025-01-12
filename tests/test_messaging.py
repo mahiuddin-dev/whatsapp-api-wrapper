@@ -24,7 +24,7 @@ class TestMessagingClient(unittest.TestCase):
         # Initialize the MessagingClient
         self.client = MessagingClient(self.access_token, self.phone_number_id)
 
-
+    # Send Text Message
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_text_message(self, mock_request):
         """Test sending a text message."""
@@ -47,12 +47,13 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Reply to Text Message
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_reply_text_message(self, mock_request):
         """Test replying to a text message."""
         mock_request.return_value = {"success": True}
 
-        previous_message_id = "abc123"
+        previous_message_id = "wam1234567890...."
         message = "Thank you for your message!"
 
         response = self.client.reply_text_message(self.recipient_id, message, previous_message_id)
@@ -76,6 +77,34 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Reply with Reaction Message
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_send_reaction_message(self, mock_request):
+        """Test sending a reaction message."""
+        mock_request.return_value = {"success": True}
+
+        message_id = "wam1234567890..."
+        emoji = "👍"
+
+        response = self.client.send_reaction_message(self.recipient_id, message_id, emoji)
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            self.client.endpoint,
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_id,
+                "type": "reaction",
+                "reaction": {
+                    "message_id": message_id,
+                    "emoji": emoji,
+                },
+            },
+        )
+
+    # Send Interactive Message with Buttons
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_button_message(self, mock_request):
         """Test sending a button message."""
@@ -104,6 +133,7 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Interactive Message with List
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_list_message(self, mock_request):
         """Test sending a list message."""

@@ -10,6 +10,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
 - [Sending a Text Message](#sending-a-text-message)
 - [Replying to a Text Message](#replying-to-a-text-message)
+- [Send Reaction Message](#send-reaction-message)
 - [Sending a Button Message](#sending-a-button-message)
 - [Validation Rules for Button Messages](#validation-rules-for-button-messages)
 - [Sending a List Message](#sending-a-list-message)
@@ -48,13 +49,13 @@ send_text_message(recipient_id: str, message: str) -> dict
 ```
 
 ### Parameters
-- `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
-- `message` *(str)*: The text message content.
-- `preview_url` *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
+- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`message`** *(str)*: The text message content.
+- **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
 
 ### Example: Sending a Text Message
 ```python
-recipient_id = "+1234567890"
+recipient_id = "1234567890"
 message = "Hello from WhatsApp API!"
 
 # Send a text message
@@ -74,14 +75,14 @@ reply_text_message(recipient_id: str, message: str, previous_message_id: str, pr
 ```
 
 ### Parameters
-- `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
-- `message` *(str)*: The reply message content. Maximum length is 4096 characters.
-- `previous_message_id` *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
-- `preview_url` *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
+- ****`recipient_id`**** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- ****`message`**** *(str)*: The reply message content. Maximum length is 4096 characters.
+- **`previous_message_id`** *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
+- **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
 
 ### Example: Replying to a Text Message
 ```python
-recipient_id = "+1234567890"
+recipient_id = "1234567890"
 message = "Thank you for reaching out!"
 previous_message_id = "abc123"
 
@@ -104,6 +105,49 @@ print("Response:", response)
 - [`send_text_message`](#sending-a-text-message): Use this method to send plain text messages without referencing a previous message.
 
 ---
+
+
+## Send Reaction Message
+
+The `send_reaction_message` method allows you to send a reaction (emoji) to a specific message in a WhatsApp conversation.
+
+### Method Signature
+```python
+send_reaction_message(recipient_id: str, message_id: str, emoji: str) -> dict
+```
+
+### Parameters
+- ****`recipient_id`**** *(str)*:  
+  The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+
+- **`message_id`** *(str)*:  
+  The ID of the message to which the reaction applies.
+
+- **`emoji`** *(str)*:  
+  The emoji for the reaction (e.g., 👍, ❤️, 😂).
+
+### Returns
+- A JSON response from the WhatsApp API indicating the success or failure of the operation.
+
+### Example Usage
+```python
+recipient_id = "1234567890"
+message_id = "wam1234567890"
+emoji = "❤️"
+
+response = client.send_reaction_message(recipient_id, message_id, emoji)
+print("Response:", response)
+```
+
+
+### Notes
+- The `message_id` must reference a valid message ID from the conversation.
+- Only emojis are allowed in the `emoji` field.
+
+### Related Methods
+- [`send_text_message`](#sending-a-text-message)
+
+---
 ## Sending a Button Message
 
 The `send_button_message` method is used to send interactive button messages. These messages can contain up to 3 buttons that the recipient can tap.
@@ -114,18 +158,18 @@ send_button_message(recipient_id: str, text: str, buttons: list[dict]) -> dict
 ```
 
 ### Parameters
-- `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
-- `text` *(str)*: The message text to display above the buttons.
-- `buttons` *(list[dict])*: A list of button objects. Each button must include:
-  - `type` *(str)*: The type of the button (e.g., `"reply"`).
-  - `reply` *(dict)*:
-    - `id` *(str)*: A unique identifier for the button.
-    - `title` *(str)*: The button text (max 20 characters).
+- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`text`** *(str)*: The message text to display above the buttons.
+- **`buttons`** *(list[dict])*: A list of button objects. Each button must include:
+  - **`type`** *(str)*: The type of the button (e.g., `"reply"`).
+  - **`reply`** *(dict)*:
+    - **`id`** *(str)*: A unique identifier for the button.
+    - **`title`** *(str)*: The button text (max 20 characters).
 
 ### Example: Sending a Button Message
 
 ```python
-recipient_id = "+1234567890"
+recipient_id = "1234567890"
 text = "Do you agree with our terms?"
 buttons = [
     {"type": "reply", "reply": {"id": "btn_yes", "title": "Yes"}},
@@ -141,7 +185,7 @@ print("Response:", response)
 
 ## Validation Rules for Button Messages
 
-When sending button messages, the `buttons` parameter must adhere to the following rules. If any rule is violated, a `ValueError` is raised.
+When sending button messages, the **`buttons`** parameter must adhere to the following rules. If any rule is violated, a `ValueError` is raised.
 
 ### Button Validation Table
 
@@ -159,7 +203,7 @@ try:
         {"type": "reply", "reply": {"id": "duplicate_id", "title": "Yes"}},
         {"type": "reply", "reply": {"id": "duplicate_id", "title": "No"}},
     ]
-    client.send_button_message("+1234567890", "Choose an option:", buttons)
+    client.send_button_message("1234567890", "Choose an option:", buttons)
 except ValueError as e:
     print("Validation Error:", e)
 ```
@@ -183,22 +227,22 @@ send_list_message(
 ```
 
 ### Parameters
-- `recipient_id` *(str)*: The recipient's WhatsApp phone number in international format (e.g., `+1234567890`).
-- `body_text` *(str)*: The main body text of the message (max 4096 characters).
-- `sections` *(list[dict])*: A list of sections, where each section must include:
-  - `title` *(str)*: The title of the section (max 24 characters).
-  - `rows` *(list[dict])*: A list of rows, where each row must include (1–10):
-    - `id` *(str)*: A unique identifier for the row.
-    - `title` *(str)*: The row title (max 24 characters).
-    - `description` *(Optional[str])*: A brief description of the row (max 72 characters).
-- `button_cta` *(str)*: The label text for the Call-To-Action button (max 20 characters).
-- `header_text` *(Optional[str])*: An optional header for the message (max 60 characters).
-- `footer_text` *(Optional[str])*: An optional footer for the message (max 60 characters).
+- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`body_text`** *(str)*: The main body text of the message (max 4096 characters).
+- **`sections`** *(list[dict])*: A list of sections, where each section must include:
+  - **`title`** *(str)*: The title of the section (max 24 characters).
+  - **`rows`** *(list[dict])*: A list of rows, where each row must include (1–10):
+    - **`id`** *(str)*: A unique identifier for the row.
+    - **`title`** *(str)*: The row title (max 24 characters).
+    - **`description`** *(Optional[str])*: A brief description of the row (max 72 characters).
+- **`button_cta`** *(str)*: The label text for the Call-To-Action button (max 20 characters).
+- **`header_text`** *(Optional[str])*: An optional header for the message (max 60 characters).
+- **`footer_text`** *(Optional[str])*: An optional footer for the message (max 60 characters).
 
 
 ### Example: Sending a List Message
 ```python
-recipient_id = "+1234567890"
+recipient_id = "1234567890"
 body_text = "Choose one of the following options:"
 button_cta = "View Options"
 sections = [
@@ -250,7 +294,7 @@ try:
             ],
         },
     ]
-    client.send_list_message("+1234567890", "Choose an option:", sections, "Options")
+    client.send_list_message("1234567890", "Choose an option:", sections, "Options")
 except ValueError as e:
     print("Validation Error:", e)
 ```
@@ -286,7 +330,7 @@ All methods return the API response as a dictionary. On success, the response ty
 ### Example
 ```python
 try:
-    client.send_list_message("+1234567890", "Choose an option:", [], "CTA Button")
+    client.send_list_message("1234567890", "Choose an option:", [], "CTA Button")
 except ValueError as e:
     print("Validation Error:", e)
 ```

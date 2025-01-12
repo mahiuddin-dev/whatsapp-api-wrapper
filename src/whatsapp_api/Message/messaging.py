@@ -65,6 +65,30 @@ class MessagingClient(BaseClient):
 
         return self._request("POST", self.endpoint, payload)
 
+    # Send Reply with Reaction Message
+    def send_reaction_message(self, recipient_id, message_id, emoji):
+        """
+        Send a reaction to a specific WhatsApp message.
+
+        :param recipient_id: The recipient's WhatsApp phone number in international format (e.g., 1234567890).
+        :param message_id: The ID of the message to which the reaction applies.
+        :param emoji: The emoji for the reaction (e.g., 👍, ❤️, 😂).
+        :return: API response JSON
+        """
+        # Prepare the payload
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_id,
+            "type": "reaction",
+            "reaction": {
+                "message_id": message_id,
+                "emoji": emoji,
+            },
+        }
+
+        return self._request("POST", self.endpoint, payload)
+
     # Send Interactive Message with Buttons
     def send_button_message(self, recipient_id, text, buttons):
         """
