@@ -1,0 +1,103 @@
+import os
+import sys
+import unittest
+from unittest.mock import patch, mock_open, MagicMock
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../src")))
+from whatsapp_api.media.media_client import MediaClient
+
+
+class TestMediaClient(unittest.TestCase):
+    def setUp(self):
+        """Set up the test environment."""
+        # Mock environment variables
+        self.access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
+        self.phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
+        self.recipient_id = os.getenv("TEST_RECIPIENT_ID")
+
+        # Initialize MediaClient
+        self.media_client = MediaClient(self.access_token, self.phone_number_id)
+
+    @patch("os.path.isfile", return_value=True)
+    @patch("mimetypes.guess_type", return_value=("image/jpeg", None))
+    @patch("builtins.open", new_callable=mock_open, read_data=b"mock file content")
+    @patch("requests.request")
+    def test_upload_media_success(self, mock_request, mock_open, mock_guess_type, mock_isfile):
+        """Test successful media upload."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(status_code=200, json=lambda: {"id": "mock_media_id"})
+
+        # Call upload_media
+        media_id = self.media_client.upload_media("/path/to/sample.jpg")
+
+        # Assertions
+        self.assertEqual(media_id, "mock_media_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            self.media_client.base_url + self.media_client.endpoint,
+            data={"messaging_product": "whatsapp", "type": "image/jpeg"},
+            files={
+                "file": ("sample.jpg", mock_open.return_value, "image/jpeg", {"Expires": "0"})
+            },
+            headers={"Authorization": f"Bearer {self.access_token}"},
+        )
+
+
+    @patch("os.path.isfile", return_value=False)
+    def test_upload_media_file_not_found(self, mock_isfile):
+        media_client = MediaClient(access_token="mock_access_token", phone_number_id="1234567890")
+        with self.assertRaises(FileNotFoundError):
+            media_client.upload_media("/path/to/nonexistent.jpg")
+
+    @patch("os.path.isfile", return_value=True)
+    @patch("mimetypes.guess_type", return_value=(None, None))
+    def test_upload_media_mime_type_not_found(self, mock_guess_type, mock_isfile):
+        with self.assertRaises(ValueError):
+            self.media_client.upload_media("/path/to/unknown.file")
+
+    @patch("os.path.isfile", return_value=True)
+    @patch("mimetypes.guess_type", return_value=("audio/mpeg", None))
+    @patch("builtins.open", new_callable=mock_open, read_data=b"mock audio content")
+    @patch("requests.request")
+    def test_upload_audio_success(self, mock_request, mock_open, mock_guess_type, mock_isfile):
+        """Test successful upload of an audio file."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(status_code=200, json=lambda: {"id": "mock_audio_id"})
+
+        # Call the upload_media method for an audio file
+        media_id = self.media_client.upload_media("/path/to/sample.mp3")
+
+        # Assertions
+        self.assertEqual(media_id, "mock_audio_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            data={"messaging_product": "whatsapp", "type": "audio/mpeg"},
+            files={
+                "file": ("sample.mp3", mock_open.return_value, "audio/mpeg", {"Expires": "0"})
+            },
+            headers={"Authorization": f"Bearer {self.access_token}"},
+        )
+
+    @patch("os.path.isfile", return_value=True)
+    @patch("mimetypes.guess_type", return_value=("application/pdf", None))
+    @patch("builtins.open", new_callable=mock_open, read_data=b"mock pdf content")
+    @patch("requests.request")
+    def test_upload_pdf_success(self, mock_request, mock_open, mock_guess_type, mock_isfile):
+        """Test successful upload of a PDF file."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(status_code=200, json=lambda: {"id": "mock_pdf_id"})
+
+        # Call the upload_media method for a PDF file
+        media_id = self.media_client.upload_media("/path/to/sample.pdf")
+
+        # Assertions
+        self.assertEqual(media_id, "mock_pdf_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            data={"messaging_product": "whatsapp", "type": "application/pdf"},
+            files={
+                "file": ("sample.pdf", mock_open.return_value, "application/pdf", {"Expires": "0"})
+            },
+            headers={"Authorization": f"Bearer {self.access_token}"},
+        )
