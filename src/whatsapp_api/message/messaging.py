@@ -1,5 +1,5 @@
 from whatsapp_api.base_client import BaseClient
-from whatsapp_api.Message.validation import validate_buttons, validate_list_message
+from whatsapp_api.message.validation import validate_buttons, validate_list_message
 
 
 class MessagingClient(BaseClient):

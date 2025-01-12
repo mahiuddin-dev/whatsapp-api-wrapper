@@ -28,7 +28,7 @@ To send messages, you must initialize the `MessagingClient` class. The class req
 
 ### Example: Initialize the MessagingClient
 ```python
-from whatsapp_api.Message.messaging import MessagingClient
+from whatsapp_api.message.messaging import MessagingClient
 
 access_token = "your_access_token_here"
 phone_number_id = "your_phone_number_id_here"
