@@ -16,9 +16,9 @@ class TestMessagingClient(unittest.TestCase):
         # Load variables from .env
         self.access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
         self.phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
-        self.recipient_id = os.getenv("TEST_RECIPIENT_ID")
+        self.recipient_phone_number = os.getenv("TEST_RECIPIENT_PHONE_NUMBER")
 
-        if not self.access_token or not self.phone_number_id or not self.recipient_id:
+        if not self.access_token or not self.phone_number_id or not self.recipient_phone_number:
             raise EnvironmentError("Missing environment variables in .env file.")
 
         # Initialize the MessagingClient
@@ -30,7 +30,7 @@ class TestMessagingClient(unittest.TestCase):
         """Test sending a text message."""
         mock_request.return_value = {"success": True}
 
-        response = self.client.send_text_message(self.recipient_id, "Hello, World!")
+        response = self.client.send_text_message(self.recipient_phone_number, "Hello, World!")
         self.assertEqual(response, {"success": True})
 
         mock_request.assert_called_once_with(
@@ -38,7 +38,7 @@ class TestMessagingClient(unittest.TestCase):
             f"{self.phone_number_id}/messages",
             {
                 "messaging_product": "whatsapp",
-                "to": self.recipient_id,
+                "to": self.recipient_phone_number,
                 "type": "text",
                 "text": {
                     'preview_url': False,
@@ -53,10 +53,10 @@ class TestMessagingClient(unittest.TestCase):
         """Test replying to a text message."""
         mock_request.return_value = {"success": True}
 
-        previous_message_id = "wam1234567890...."
+        context_message_id = "wam1234567890...."
         message = "Thank you for your message!"
 
-        response = self.client.reply_text_message(self.recipient_id, message, previous_message_id)
+        response = self.client.reply_text_message(self.recipient_phone_number, message, context_message_id)
         self.assertEqual(response, {"success": True})
 
         mock_request.assert_called_once_with(
@@ -65,9 +65,9 @@ class TestMessagingClient(unittest.TestCase):
             {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": self.recipient_id,
+                "to": self.recipient_phone_number,
                 "context": {
-                    "message_id": previous_message_id
+                    "message_id": context_message_id
                 },
                 "type": "text",
                 "text": {
@@ -86,7 +86,7 @@ class TestMessagingClient(unittest.TestCase):
         message_id = "wam1234567890..."
         emoji = "👍"
 
-        response = self.client.send_reaction_message(self.recipient_id, message_id, emoji)
+        response = self.client.send_reaction_message(self.recipient_phone_number, message_id, emoji)
         self.assertEqual(response, {"success": True})
 
         mock_request.assert_called_once_with(
@@ -95,7 +95,7 @@ class TestMessagingClient(unittest.TestCase):
             {
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": self.recipient_id,
+                "to": self.recipient_phone_number,
                 "type": "reaction",
                 "reaction": {
                     "message_id": message_id,
@@ -115,7 +115,7 @@ class TestMessagingClient(unittest.TestCase):
             {"type": "reply", "reply": {"id": "btn2", "title": "Button 2"}},
         ]
 
-        response = self.client.send_button_message(self.recipient_id, "Choose an option:", buttons)
+        response = self.client.send_button_message(self.recipient_phone_number, "Choose an option:", buttons)
         self.assertEqual(response, {"success": True})
 
         mock_request.assert_called_once_with(
@@ -123,7 +123,7 @@ class TestMessagingClient(unittest.TestCase):
             f"{self.phone_number_id}/messages",
             {
                 "messaging_product": "whatsapp",
-                "to": self.recipient_id,
+                "to": self.recipient_phone_number,
                 "type": "interactive",
                 "interactive": {
                     "type": "button",
@@ -134,10 +134,13 @@ class TestMessagingClient(unittest.TestCase):
         )
 
     # Send Interactive Message with List
-    @patch("whatsapp_api.base_client.BaseClient._request")
+    @patch("requests.request")
     def test_send_list_message(self, mock_request):
         """Test sending a list message."""
-        mock_request.return_value = {"success": True}
+        mock_request.return_value = MagicMock(
+            status_code=200,
+            json=lambda: {"messaging_product": "whatsapp", "messages": [{"id": "wamid.mock_message_id"}]},
+        )
 
         sections = [
             {
@@ -150,22 +153,23 @@ class TestMessagingClient(unittest.TestCase):
         ]
 
         response = self.client.send_list_message(
-            self.recipient_id,
+            self.recipient_phone_number,
             body_text="Which shipping option do you prefer?",
             sections=sections,
             button_cta="Shipping Options",
             header_text="Choose Shipping Option",
             footer_text="Lucky Shrub: Your gateway to succulents™"
         )
-        self.assertEqual(response, {"success": True})
+        # self.assertEqual(response, {"success": True})
+        self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
 
         mock_request.assert_called_once_with(
             "POST",
-            f"{self.phone_number_id}/messages",
-            {
+            f"{self.client.base_url}{self.client.endpoint}",
+            json={
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
-                "to": self.recipient_id,
+                "to": self.recipient_phone_number,
                 "type": "interactive",
                 "interactive": {
                     "type": "list",
@@ -177,6 +181,10 @@ class TestMessagingClient(unittest.TestCase):
                         "sections": sections,
                     },
                 },
+            },
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
             },
         )
 

@@ -12,7 +12,7 @@ class TestMediaClient(unittest.TestCase):
         # Mock environment variables
         self.access_token = os.getenv("WHATSAPP_ACCESS_TOKEN")
         self.phone_number_id = os.getenv("WHATSAPP_PHONE_NUMBER_ID")
-        self.recipient_id = os.getenv("TEST_RECIPIENT_ID")
+        self.recipient_phone_number = os.getenv("TEST_RECIPIENT_PHONE_NUMBER")
 
         # Initialize MediaClient
         self.media_client = MediaClient(self.access_token, self.phone_number_id)
@@ -40,7 +40,6 @@ class TestMediaClient(unittest.TestCase):
             },
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
-
 
     @patch("os.path.isfile", return_value=False)
     def test_upload_media_file_not_found(self, mock_isfile):
@@ -100,4 +99,81 @@ class TestMediaClient(unittest.TestCase):
                 "file": ("sample.pdf", mock_open.return_value, "application/pdf", {"Expires": "0"})
             },
             headers={"Authorization": f"Bearer {self.access_token}"},
+        )
+
+    @patch("requests.request")
+    def test_send_image_message_by_id_success(self, mock_request):
+        """Test successful image message sending."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(
+            status_code=200,
+            json=lambda: {"messaging_product": "whatsapp", "messages": [{"id": "wamid.mock_message_id"}]},
+        )
+
+        # Call send_media_message_by_id
+        media_id = "mock_media_id"
+        context_message_id = "mock_context_message_id"
+        response = self.media_client.send_media_message_by_id(
+            recipient_phone_number=self.recipient_phone_number,
+            media_id=media_id,
+            media_type="image",
+            context_message_id=context_message_id
+        )
+
+        # Assertions
+        self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            json={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "image",
+                "image": {"id": media_id},
+                "context": {"message_id": context_message_id}
+            },
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
+            },
+        )
+
+    @patch("requests.request")
+    def test_send_document_with_caption_and_filename(self, mock_request):
+        """Test successful document message sending with caption and filename."""
+        mock_request.return_value = MagicMock(
+            status_code=200,
+            json=lambda: {"messaging_product": "whatsapp", "messages": [{"id": "wamid.mock_message_id"}]},
+        )
+
+        media_id = "mock_document_id"
+        response = self.media_client.send_media_message_by_id(
+            recipient_phone_number=self.recipient_phone_number,
+            media_id=media_id,
+            media_type="document",
+            caption="Here is your document.",
+            filename="example.pdf"
+        )
+
+        # Assertions
+        self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            json={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "document",
+                "document": {
+                    "id": media_id,
+                    "caption": "Here is your document.",
+                    "filename": "example.pdf",
+                },
+            },
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
+            },
         )

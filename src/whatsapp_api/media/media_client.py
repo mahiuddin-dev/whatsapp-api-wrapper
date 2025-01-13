@@ -74,3 +74,51 @@ class MediaClient(BaseClient):
 
         # Return the media ID from the response
         return response.get("id")
+
+    # Send media Message by ID
+    def send_media_message_by_id(self, recipient_phone_number, media_id, media_type, context_message_id=None, **kwargs):
+        """
+        Send a media message using a media ID.
+
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param media_id: Media ID of the media to send.
+        :param media_type: Type of the media to send (e.g., "image", "audio", "document", "sticker", "video").
+        :param context_message_id: (Optional) Message ID of a previous message to reply to.
+        :param kwargs: Additional fields for the media type (e.g., "caption" or "filename").
+        :return: Response from the WhatsApp API.
+        :raises ValueError: If an unsupported media type is provided or invalid parameters are used.
+        :raises Exception: If the API request fails.
+        """
+
+        # Validate supported media types
+        supported_media_types = {"image", "audio", "document", "sticker", "video"}
+        if media_type not in supported_media_types:
+            raise ValueError(f"Unsupported media type: {media_type}. Supported types are: {', '.join(supported_media_types)}")
+
+        # media payload
+        media_payload = {"id": media_id}
+
+        # Handle caption and filename based on media type
+        if "caption" in kwargs:
+            if media_type in {"audio", "sticker"}:
+                raise ValueError(f"Caption is not allowed for media type: {media_type}")
+            media_payload["caption"] = kwargs["caption"]
+
+        if media_type == "document" and "filename" in kwargs:
+            media_payload["filename"] = kwargs["filename"]
+
+        # payload
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone_number,
+            "type": media_type,
+            media_type: media_payload,
+        }
+
+        # Add context if provided
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        # Send the request and return the response
+        return self._request("POST", self.endpoint, payload)

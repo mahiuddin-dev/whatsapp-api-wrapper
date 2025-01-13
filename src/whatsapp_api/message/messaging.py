@@ -14,11 +14,11 @@ class MessagingClient(BaseClient):
         self.endpoint = f"{phone_number_id}/messages"
 
     # Send Text Message
-    def send_text_message(self, recipient_id, message, preview_url=False):
+    def send_text_message(self, recipient_phone_number, message, preview_url=False):
         """
         Send a text message.
 
-        :param recipient_id: The recipient's WhatsApp number
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param message: The message content - Maximum 4096 characters.
         :param preview_url: Preview URL render a link preview of any URL in the body text string. (optional)
         :return: API response JSON
@@ -27,7 +27,7 @@ class MessagingClient(BaseClient):
         # Prepare the payload
         payload = {
             "messaging_product": "whatsapp",
-            "to": recipient_id,
+            "to": recipient_phone_number,
             "type": "text",
             "text": {
                 "preview_url": preview_url, 
@@ -37,13 +37,13 @@ class MessagingClient(BaseClient):
         return self._request("POST", self.endpoint, payload)
 
     # Send Reply to Text Message
-    def reply_text_message(self, recipient_id, message, previous_message_id, preview_url=False):
+    def reply_text_message(self, recipient_phone_number, message, context_message_id, preview_url=False):
         """
         Send a reply to a text message.
 
-        :param recipient_id: The recipient's WhatsApp number
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param message: The reply message content - Maximum 4096 characters.
-        :param previous_message_id: The ID of the previous message in the conversation.
+        :param context_message_id: The ID of the previous message in the conversation.
         :param preview_url: Preview URL render a link preview of any URL in the body text string. (optional)
         :return: API response JSON
         """
@@ -52,9 +52,9 @@ class MessagingClient(BaseClient):
         payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
-            "to": recipient_id,
+            "to": recipient_phone_number,
             "context": {
-                "message_id": previous_message_id
+                "message_id": context_message_id
             },
             "type": "text",
             "text": {
@@ -66,11 +66,11 @@ class MessagingClient(BaseClient):
         return self._request("POST", self.endpoint, payload)
 
     # Send Reply with Reaction Message
-    def send_reaction_message(self, recipient_id, message_id, emoji):
+    def send_reaction_message(self, recipient_phone_number, message_id, emoji):
         """
         Send a reaction to a specific WhatsApp message.
 
-        :param recipient_id: The recipient's WhatsApp phone number in international format (e.g., 1234567890).
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param message_id: The ID of the message to which the reaction applies.
         :param emoji: The emoji for the reaction (e.g., 👍, ❤️, 😂).
         :return: API response JSON
@@ -79,7 +79,7 @@ class MessagingClient(BaseClient):
         payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
-            "to": recipient_id,
+            "to": recipient_phone_number,
             "type": "reaction",
             "reaction": {
                 "message_id": message_id,
@@ -90,11 +90,11 @@ class MessagingClient(BaseClient):
         return self._request("POST", self.endpoint, payload)
 
     # Send Interactive Message with Buttons
-    def send_button_message(self, recipient_id, text, buttons):
+    def send_button_message(self, recipient_phone_number, text, buttons):
         """
         Send an interactive button message.
 
-        :param recipient_id: The recipient's WhatsApp number
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param text: The message text
         :param buttons: List of button dictionaries 
         :return: API response JSON
@@ -105,7 +105,7 @@ class MessagingClient(BaseClient):
         # Prepare the payload
         payload = {
             "messaging_product": "whatsapp",
-            "to": recipient_id,
+            "to": recipient_phone_number,
             "type": "interactive",
             "interactive": {
                 "type": "button",
@@ -116,11 +116,11 @@ class MessagingClient(BaseClient):
         return self._request("POST", self.endpoint, payload)
 
     # Send Interactive List Message with Header and Footer
-    def send_list_message(self, recipient_id, body_text, sections, button_cta, header_text=None, footer_text=None):
+    def send_list_message(self, recipient_phone_number, body_text, sections, button_cta, header_text=None, footer_text=None):
         """
         Send an interactive list message.
 
-        :param recipient_id: The recipient's WhatsApp number.
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param body_text: The main body text of the message.
         :param sections: List of section dictionaries (with title and rows).
         :param button_cta: Button label text (CTA button).
@@ -135,7 +135,7 @@ class MessagingClient(BaseClient):
         payload = {
             "messaging_product": "whatsapp",
             "recipient_type": "individual",
-            "to": recipient_id,
+            "to": recipient_phone_number,
             "type": "interactive",
             "interactive": {
                 "type": "list",

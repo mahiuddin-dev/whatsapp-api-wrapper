@@ -48,7 +48,7 @@ For detailed usage instructions, examples, and validation rules, check out the f
    ```env
    WHATSAPP_ACCESS_TOKEN=your_access_token_here
    WHATSAPP_PHONE_NUMBER_ID=your_phone_number_id_here
-   TEST_RECIPIENT_ID=recipient_whatsapp_number_here
+   TEST_RECIPIENT_PHONE_NUMBER=recipient_whatsapp_number_here
    ```
 
    Replace the placeholders with your actual values.
@@ -58,7 +58,7 @@ For detailed usage instructions, examples, and validation rules, check out the f
    ```python
    from whatsapp_api.message.messaging import MessagingClient
    client = MessagingClient(access_token, phone_number_id)
-   response = client.send_text_message(recipient_id, "Hello from WhatsApp API!")
+   response = client.send_text_message(recipient_phone_number, "Hello from WhatsApp API!")
    print("Response:", response)
    ```
 

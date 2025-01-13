@@ -9,6 +9,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
 - [Sending a Text Message](#sending-a-text-message)
+- [Sending Media Message](./sending-media-message.md)
 - [Replying to a Text Message](#replying-to-a-text-message)
 - [Send Reaction Message](#send-reaction-message)
 - [Sending a Button Message](#sending-a-button-message)
@@ -45,21 +46,21 @@ The `send_text_message` method is used to send plain text messages to a recipien
 
 ### Method Signature
 ```python
-send_text_message(recipient_id: str, message: str) -> dict
+send_text_message(recipient_phone_number: str, message: str) -> dict
 ```
 
 ### Parameters
-- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 - **`message`** *(str)*: The text message content.
 - **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
 
 ### Example: Sending a Text Message
 ```python
-recipient_id = "1234567890"
+recipient_phone_number = "1234567890"
 message = "Hello from WhatsApp API!"
 
 # Send a text message
-response = client.send_text_message(recipient_id, message)
+response = client.send_text_message(recipient_phone_number, message)
 print("Response:", response)
 ```
 
@@ -71,32 +72,32 @@ The `reply_text_message` method allows you to reply to a specific message in a W
 
 ### Method Signature
 ```python
-reply_text_message(recipient_id: str, message: str, previous_message_id: str, preview_url: bool = False) -> dict
+reply_text_message(recipient_phone_number: str, message: str, context_message_id: str, preview_url: bool = False) -> dict
 ```
 
 ### Parameters
-- ****`recipient_id`**** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- ****`recipient_phone_number`**** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 - ****`message`**** *(str)*: The reply message content. Maximum length is 4096 characters.
-- **`previous_message_id`** *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
+- **`context_message_id`** *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
 - **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
 
 ### Example: Replying to a Text Message
 ```python
-recipient_id = "1234567890"
+recipient_phone_number = "1234567890"
 message = "Thank you for reaching out!"
-previous_message_id = "abc123"
+context_message_id = "abc123"
 
 # Reply to a text message
 response = client.reply_text_message(
-    recipient_id=recipient_id,
+    recipient_phone_number=recipient_phone_number,
     message=message,
-    previous_message_id=previous_message_id
+    context_message_id=context_message_id
 )
 print("Response:", response)
 ```
 
 ### Notes
-- The method references the previous message in the conversation using the `previous_message_id`. This ensures that the reply is properly threaded.
+- The method references the previous message in the conversation using the `context_message_id`. This ensures that the reply is properly threaded.
 - The `preview_url` parameter enables link previews in the message body when set to **`True`**.
 
 ---
@@ -113,11 +114,11 @@ The `send_reaction_message` method allows you to send a reaction (emoji) to a sp
 
 ### Method Signature
 ```python
-send_reaction_message(recipient_id: str, message_id: str, emoji: str) -> dict
+send_reaction_message(recipient_phone_number: str, message_id: str, emoji: str) -> dict
 ```
 
 ### Parameters
-- ****`recipient_id`**** *(str)*:  
+- ****`recipient_phone_number`**** *(str)*:  
   The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 
 - **`message_id`** *(str)*:  
@@ -131,14 +132,13 @@ send_reaction_message(recipient_id: str, message_id: str, emoji: str) -> dict
 
 ### Example Usage
 ```python
-recipient_id = "1234567890"
+recipient_phone_number = "1234567890"
 message_id = "wam1234567890"
 emoji = "❤️"
 
-response = client.send_reaction_message(recipient_id, message_id, emoji)
+response = client.send_reaction_message(recipient_phone_number, message_id, emoji)
 print("Response:", response)
 ```
-
 
 ### Notes
 - The `message_id` must reference a valid message ID from the conversation.
@@ -154,11 +154,11 @@ The `send_button_message` method is used to send interactive button messages. Th
 
 ### Method Signature
 ```python
-send_button_message(recipient_id: str, text: str, buttons: list[dict]) -> dict
+send_button_message(recipient_phone_number: str, text: str, buttons: list[dict]) -> dict
 ```
 
 ### Parameters
-- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 - **`text`** *(str)*: The message text to display above the buttons.
 - **`buttons`** *(list[dict])*: A list of button objects. Each button must include:
   - **`type`** *(str)*: The type of the button (e.g., `"reply"`).
@@ -169,7 +169,7 @@ send_button_message(recipient_id: str, text: str, buttons: list[dict]) -> dict
 ### Example: Sending a Button Message
 
 ```python
-recipient_id = "1234567890"
+recipient_phone_number = "1234567890"
 text = "Do you agree with our terms?"
 buttons = [
     {"type": "reply", "reply": {"id": "btn_yes", "title": "Yes"}},
@@ -177,7 +177,7 @@ buttons = [
 ]
 
 # Send a button message
-response = client.send_button_message(recipient_id, text, buttons)
+response = client.send_button_message(recipient_phone_number, text, buttons)
 print("Response:", response)
 ```
 
@@ -217,7 +217,7 @@ The `send_list_message` method is used to send an interactive list message. List
 ### Method Signature
 ```python
 send_list_message(
-    recipient_id: str,
+    recipient_phone_number: str,
     body_text: str,
     sections: list[dict],
     button_cta: str,
@@ -227,7 +227,7 @@ send_list_message(
 ```
 
 ### Parameters
-- **`recipient_id`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 - **`body_text`** *(str)*: The main body text of the message (max 4096 characters).
 - **`sections`** *(list[dict])*: A list of sections, where each section must include:
   - **`title`** *(str)*: The title of the section (max 24 characters).
@@ -242,7 +242,7 @@ send_list_message(
 
 ### Example: Sending a List Message
 ```python
-recipient_id = "1234567890"
+recipient_phone_number = "1234567890"
 body_text = "Choose one of the following options:"
 button_cta = "View Options"
 sections = [
@@ -258,7 +258,7 @@ header_text = "Choose an Option"
 footer_text = "Thank you for using our service!"
 
 # Send a list message
-response = client.send_list_message(recipient_id, body_text, sections, button_cta, header_text, footer_text)
+response = client.send_list_message(recipient_phone_number, body_text, sections, button_cta, header_text, footer_text)
 print("Response:", response)
 ```
 
@@ -322,19 +322,4 @@ All methods return the API response as a dictionary. On success, the response ty
     ]
 }
 ```
-
 ---
-
-## Error Handling
-
-### Example
-```python
-try:
-    client.send_list_message("1234567890", "Choose an option:", [], "CTA Button")
-except ValueError as e:
-    print("Validation Error:", e)
-```
-Output:
-```plaintext
-Validation Error: Sections must be a non-empty list of dictionaries.
-```
