@@ -17,7 +17,6 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Sending a List Message](#sending-a-list-message)
 - [Validation Rules for List Messages](#validation-rules-for-list-messages)
 - [Response](#response)
-- [Error Handling](#error-handling)
 
 ---
 

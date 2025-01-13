@@ -10,6 +10,7 @@ This guide explains how to send media messages using the WhatsApp API Python Pac
 - [Initializing the MediaClient](#initializing-the-mediaclient)
 - [Upload Media](#upload-media)
 - [Sending Media Message](#sending-media-message-by-id)
+- [Response](#response)
 
 ---
 
