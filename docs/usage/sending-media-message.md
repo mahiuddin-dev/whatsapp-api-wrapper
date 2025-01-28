@@ -161,8 +161,71 @@ The `upload_media` method raises exceptions for the following cases:
 
 
 ---
+## Retrieve Media URL by Media ID
 
+The `get_media_url` method is used to retrieve the URL of a media file from the Meta API by providing a media ID. This media ID is obtained after uploading the media using the WhatsApp Business API.
 
+---
+
+### Method Signature
+```python
+get_media_url(media_id: str) -> str
+```
+
+---
+
+### Parameters
+- `media_id` (str): The unique identifier for the media file. This ID is provided by the API when you upload media using the [upload media method](#upload-media).
+
+---
+
+### Returns
+A dictionary containing the metadata and URL of the media file. The structure of the response is as follows:
+```json
+{
+    "messaging_product": "whatsapp",
+    "url": "<URL>",
+    "mime_type": "image/jpeg",
+    "sha256": "<HASH>",
+    "file_size": "303833",
+    "id": "2621233374848975"
+}
+```
+
+- `messaging_product` *(str)*: Indicates the messaging platform, always set to `"whatsapp"`.
+- `url` *(str)*: The URL of the media file that can be used to download it.
+- `mime_type` *(str)*: The MIME type of the media file (e.g., `"image/jpeg"` for an image).
+- `sha256` *(str)*: The SHA-256 hash of the media file, useful for verifying file integrity.
+- `file_size` *(str)*: The size of the media file in bytes.
+- `id` *(str)*: The unique identifier of the media file.
+
+---
+
+### Exceptions
+The method raises an `Exception` if the API request fails. This includes cases such as:
+- Invalid `media_id`
+- Unauthorized access due to invalid or expired access tokens
+- API errors (e.g., rate limiting, server issues)
+
+---
+
+### Example Usage
+```python
+access_token = "your_meta_api_access_token"
+phone_number_id = "your_phone_number_id"
+
+media_client = MediaClient(access_token, phone_number_id)
+
+# Retrieve media URL
+media_id = "2621233374848975"
+try:
+    media_url = media_client.get_media_url(media_id)
+    print(f"Media URL: {media_url}")
+except Exception as e:
+    print(f"Failed to retrieve media URL: {e}")
+```
+
+---
 
 
 ## Sending Media Message by ID
