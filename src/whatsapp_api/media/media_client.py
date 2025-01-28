@@ -14,6 +14,7 @@ class MediaClient(BaseClient):
         """
         super().__init__(access_token)
         self.endpoint = f"{phone_number_id}/media"
+        self.message_endpoint = f"{phone_number_id}/messages"
 
     def _request_with_files(self, method, endpoint, payload, files):
         """
@@ -75,6 +76,19 @@ class MediaClient(BaseClient):
         # Return the media ID from the response
         return response.get("id")
 
+    # Retrieve Media URL
+    def get_media_url(self, media_id):
+        """
+        Get the media URL from the Meta API.
+
+        :param media_id: Media ID from the upload_media method.
+        :return: Media URL from the API response.
+        :raises Exception: If the API request fails.
+        """
+        endpoint = f"{self.endpoint}/{media_id}"
+        response = self._request_with_files("GET", endpoint, {}, {})
+        return response.get("url")
+
     # Send media Message by ID
     def send_media_message_by_id(self, recipient_phone_number, media_id, media_type, context_message_id=None, **kwargs):
         """
@@ -121,4 +135,4 @@ class MediaClient(BaseClient):
             payload["context"] = {"message_id": context_message_id}
 
         # Send the request and return the response
-        return self._request("POST", self.endpoint, payload)
+        return self._request("POST", self.message_endpoint, payload)

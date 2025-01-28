@@ -124,7 +124,7 @@ class TestMediaClient(unittest.TestCase):
         self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
         mock_request.assert_called_once_with(
             "POST",
-            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            f"{self.media_client.base_url}{self.media_client.message_endpoint}",
             json={
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
@@ -160,7 +160,7 @@ class TestMediaClient(unittest.TestCase):
         self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
         mock_request.assert_called_once_with(
             "POST",
-            f"{self.media_client.base_url}{self.media_client.endpoint}",
+            f"{self.media_client.base_url}{self.media_client.message_endpoint}",
             json={
                 "messaging_product": "whatsapp",
                 "recipient_type": "individual",
