@@ -212,6 +212,8 @@ The method raises an `Exception` if the API request fails. This includes cases s
 
 ### Example Usage
 ```python
+from whatsapp_api.media.media_client import MediaClient
+
 access_token = "your_meta_api_access_token"
 phone_number_id = "your_phone_number_id"
 
