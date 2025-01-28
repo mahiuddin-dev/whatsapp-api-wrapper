@@ -170,7 +170,7 @@ The `get_media_url` method is used to retrieve the URL of a media file from the 
 
 ### Method Signature
 ```python
-get_media_url(media_id: str) -> str
+get_media_url(media_id: str) -> dict
 ```
 
 ---
