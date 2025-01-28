@@ -13,6 +13,7 @@ class MediaClient(BaseClient):
         :param phone_number_id: Phone number ID from WhatsApp
         """
         super().__init__(access_token)
+        self.phone_number_id = phone_number_id
         self.endpoint = f"{phone_number_id}/media"
         self.message_endpoint = f"{phone_number_id}/messages"
 
@@ -82,12 +83,12 @@ class MediaClient(BaseClient):
         Get the media URL from the Meta API.
 
         :param media_id: Media ID from the upload_media method.
-        :return: Media URL from the API response.
+        :return: Media objects from the API response.
         :raises Exception: If the API request fails.
         """
-        endpoint = f"{self.endpoint}/{media_id}"
-        response = self._request_with_files("GET", endpoint, {}, {})
-        return response.get("url")
+        endpoint = f"{media_id}?phone_number_id={self.phone_number_id}"
+        response = self._request("GET", endpoint)
+        return response
 
     # Send media Message by ID
     def send_media_message_by_id(self, recipient_phone_number, media_id, media_type, context_message_id=None, **kwargs):

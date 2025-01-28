@@ -102,6 +102,39 @@ class TestMediaClient(unittest.TestCase):
         )
 
     @patch("requests.request")
+    def test_get_media_url_success(self, mock_request):
+        """Test successful media URL retrieval."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(
+            status_code=200, 
+            json=lambda: {
+                "messaging_product": "whatsapp",
+                "url": "<URL>",
+                "mime_type": "image/jpeg",
+                "sha256": "<HASH>",
+                "file_size": "303833",
+                "id": "2621233374848975"
+            }
+        )
+
+        # Call media_retrieve
+        media_id = "mock_media_id"
+        response = self.media_client.get_media_url(media_id)
+
+        # Assertions
+        self.assertEqual(response, "<URL>")
+        mock_request.assert_called_once_with(
+            "GET",
+            f"{self.media_client.base_url}{media_id}?phone_number_id={self.phone_number_id}",
+            json=None,
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
+            },
+        )
+
+
+    @patch("requests.request")
     def test_send_image_message_by_id_success(self, mock_request):
         """Test successful image message sending."""
         # Mock successful API response
