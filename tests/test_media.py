@@ -133,6 +133,30 @@ class TestMediaClient(unittest.TestCase):
             },
         )
 
+    # Download media from URL
+    @patch("requests.request")
+    def test_download_media_success(self, mock_request):
+        """Test successful media download."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(
+            status_code=200,
+            content=b"mock file content",
+            headers={"Content-Disposition": "attachment; filename=sample.jpg"},
+        )
+
+        media_url = "https://example.com/media/sample.jpg"
+        response = self.media_client.download_media(media_url)
+
+        self.assertEqual(response, b"mock file content")
+        mock_request.assert_called_once_with(
+            "GET",
+            f"{self.media_client.base_url}{media_url}",
+            json=None,
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
+            },
+        )
 
     @patch("requests.request")
     def test_send_image_message_by_id_success(self, mock_request):

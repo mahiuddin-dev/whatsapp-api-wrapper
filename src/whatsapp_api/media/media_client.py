@@ -90,6 +90,17 @@ class MediaClient(BaseClient):
         response = self._request("GET", endpoint)
         return response
 
+    # Download Media
+    def download_media(self, media_url):
+        """
+        Download media from the given URL.
+
+        :param media_url: URL of the media to download.
+        :return: Binary data of the media.
+        :raises Exception: If the download fails.
+        """
+        return self._request("GET", media_url, is_media=True)
+
     # Send media Message by ID
     def send_media_message_by_id(self, recipient_phone_number, media_id, media_type, context_message_id=None, **kwargs):
         """

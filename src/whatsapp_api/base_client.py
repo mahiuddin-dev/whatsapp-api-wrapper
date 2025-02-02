@@ -12,13 +12,14 @@ class BaseClient:
         self.access_token = access_token
         self.base_url = f"https://graph.facebook.com/{version}/"
 
-    def _request(self, method, endpoint, payload=None):
+    def _request(self, method, endpoint, payload=None, is_media=False):
         """
         Make an API request.
 
         :param method: HTTP method (GET, POST, etc.)
         :param endpoint: API endpoint (relative to base URL)
         :param payload: JSON payload for POST/PUT requests
+        :param is_media: Set to True if requesting media content (binary)
         :return: API response JSON
         """
         headers = {
@@ -32,6 +33,8 @@ class BaseClient:
 
         # If response successful, return the JSON response
         if response.status_code == 200:
+            if is_media:
+                return response.content
             return response.json()
 
         # Handle rate limiting or other errors

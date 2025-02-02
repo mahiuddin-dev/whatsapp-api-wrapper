@@ -164,7 +164,7 @@ The `upload_media` method raises exceptions for the following cases:
 ---
 ## Retrieve Media URL by Media ID
 
-The `get_media_url` method is used to retrieve the URL of a media file from the Meta API by providing a media ID. This media ID is obtained after uploading the media using the WhatsApp Business API.
+The `get_media_url` method is used to retrieve the URL of a media file from the Meta API by providing a media ID. This media ID is obtained after uploading the media using the WhatsApp Business API. Media URLs will expire after 5 minutes, you need to retrieve the media URL again if it expires. If you click the URL from a browser, you will get an access error. You can download media content from the [Media Download](#media-download) method.
 
 ---
 
@@ -227,6 +227,57 @@ try:
 except Exception as e:
     print(f"Failed to retrieve media URL: {e}")
 ```
+
+---
+## Download Media
+
+The `download_media` method is used to download media files from a given URL retrieved through the [Retrieve Media URL](#retrieve-media-url-by-media-id) method. Since media URLs expire after **5 minutes**, you may need to retrieve a fresh URL if downloading fails due to expiration. 
+
+### Method Signature
+```python
+download_media(media_url: str) -> bytes
+```
+
+---
+
+### Parameters
+- `media_url` *(str)*: The temporary URL of the media file. This URL is retrieved via the [`get_media_url`](#retrieve-media-url-by-media-id) method.
+
+---
+
+### Returns
+Binary data (`bytes`) representing the media file.
+
+Upon a successful request, the media content is returned as raw binary data. You can save this data to a file or process it further.
+
+---
+
+
+### Example Usage
+```python
+from whatsapp_api.media.media_client import MediaClient
+
+access_token = "your_meta_api_access_token"
+phone_number_id = "your_phone_number_id"
+
+media_client = MediaClient(access_token, phone_number_id)
+media_url = <URL>
+download = media_client.download_media(media_url)
+
+```
+
+---
+
+### Handling Expired Media URLs
+Since **media URLs expire after 5 minutes**, follow this approach:
+
+1. **Retrieve the media URL using `get_media_url(media_id)`**.
+2. **Immediately download the media file using `download_media(media_url)`**.
+3. **If you get a `404 Not Found` error, retrieve a new media URL and try again.**
+---
+
+### Related Methods
+- [`get_media_url`](#retrieve-media-url-by-media-id) – Retrieve the media URL before downloading.
 
 ---
 
