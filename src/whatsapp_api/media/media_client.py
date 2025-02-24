@@ -101,6 +101,19 @@ class MediaClient(BaseClient):
         """
         return self._request("GET", media_url, is_media=True)
 
+    # Delete Media
+    def delete_media(self, media_id):
+        """
+        Delete media
+
+        :param media_id: Media ID to delete.
+        :return: bool indicating whether the media was deleted successfully.
+        :raises Exception: If the API request fails.
+        """
+        endpoint = f"{media_id}?phone_number_id={self.phone_number_id}"
+        response = self._request("DELETE", endpoint)
+        return response
+
     # Send media Message by ID
     def send_media_message_by_id(self, recipient_phone_number, media_id, media_type, context_message_id=None, **kwargs):
         """

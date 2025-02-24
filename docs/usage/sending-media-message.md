@@ -10,6 +10,8 @@ This guide explains how to send media messages using the WhatsApp API Python Pac
 - [Initializing the MediaClient](#initializing-the-mediaclient)
 - [Upload Media](#upload-media)
 - [Retrieve Media URL by Media ID](#retrieve-media-url-by-media-id)
+- [Delete Media by Media ID](#delete-media-by-media-id)
+- [Download Media](#download-media)
 - [Sending Media Message](#sending-media-message-by-id)
 - [Response](#response)
 
@@ -226,6 +228,63 @@ try:
     print(f"Media URL: {media_url}")
 except Exception as e:
     print(f"Failed to retrieve media URL: {e}")
+```
+
+---
+
+### Delete Media by Media ID
+
+The `delete_media` method is used to delete a media file from the Meta API by providing a media ID. This media ID is obtained after uploading the media using the WhatsApp Business API. Once deleted, the media file will no longer be accessible.
+
+---
+
+### Method Signature
+```python
+delete_media(media_id: str) -> bool
+```
+
+---
+
+### Parameters
+- `media_id` (str): The unique identifier for the media file. This ID is provided by the API when you upload media using the [upload media method](#upload-media).
+
+---
+
+### Returns
+A boolean value indicating whether the media was successfully deleted.
+
+- `True`: The media was deleted successfully.
+- `False`: The media deletion failed.
+
+---
+
+### Exceptions
+The method raises an `Exception` if the API request fails. This includes cases such as:
+- Invalid `media_id`
+- Unauthorized access due to invalid or expired access tokens
+- API errors (e.g., rate limiting, server issues)
+
+---
+
+### Example Usage
+```python
+from whatsapp_api.media.media_client import MediaClient
+
+access_token = "your_meta_api_access_token"
+phone_number_id = "your_phone_number_id"
+
+media_client = MediaClient(access_token, phone_number_id)
+
+# Delete media
+media_id = "2621233374848975"
+try:
+    success = media_client.delete_media(media_id)
+    if success:
+        print("Media deleted successfully.")
+    else:
+        print("Failed to delete media.")
+except Exception as e:
+    print(f"Failed to delete media: {e}")
 ```
 
 ---
