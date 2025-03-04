@@ -161,3 +161,43 @@ class MediaClient(BaseClient):
 
         # Send the request and return the response
         return self._request("POST", self.message_endpoint, payload)
+
+    # Send media message by URL
+    def send_media_message_by_url(self, recipient_phone_number, media_url, media_type, context_message_id=None, **kwargs):
+        """
+        Send a media message using a media URL.
+
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param media_url: Media URL of the media to send.
+        :param media_type: Type of the media to send (e.g., "image", "audio", "document", "sticker", "video").
+        :param context_message_id: (Optional) Message ID of a previous message to reply to.
+        :param kwargs: Additional fields for the media type (e.g., "caption" or "filename").
+        :return: Response from the WhatsApp API.
+        :raises ValueError: If an unsupported media type is provided or invalid parameters are used.
+        :raises Exception: If the API request fails.
+        """
+
+        # media payload
+        media_payload = {"link": media_url}
+
+        # Handle caption and filename based on media type
+        if "caption" in kwargs:
+            if media_type in {"audio", "sticker"}:
+                raise ValueError(f"Caption is not allowed for media type: {media_type}")
+            media_payload["caption"] = kwargs["caption"]
+
+        # payload
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone_number,
+            "type": media_type,
+            media_type: media_payload,
+        }
+
+        # Add context if provided
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        # Send the request and return the response
+        return self._request("POST", self.message_endpoint, payload)
