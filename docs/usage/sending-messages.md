@@ -45,7 +45,12 @@ The `send_text_message` method is used to send plain text messages to a recipien
 
 ### Method Signature
 ```python
-send_text_message(recipient_phone_number: str, message: str, preview_url: bool = False) -> dict
+send_text_message(
+    recipient_phone_number: str, 
+    message: str, 
+    preview_url: bool = False, 
+    context_message_id: Optional[str] = None
+) -> dict
 ```
 
 ### Parameters
