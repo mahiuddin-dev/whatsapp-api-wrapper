@@ -198,7 +198,6 @@ send_contact_message(
     - `type`: URL type (optional; possible values: `HOME`, `WORK`).
   
 - **`context_message_id`** *(str, optional)*: The message ID of a previous message, if you are sending the contact message as a reply to an existing message. Default is `None`.
-- **`kwargs`** *(optional)*: Additional fields for the contact message.
 
 ---
 
