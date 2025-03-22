@@ -12,6 +12,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Sending Media Message](./sending-media-message.md)
 - [Replying to a Text Message](#replying-to-a-text-message)
 - [Send Reaction Message](#send-reaction-message)
+- [Sending Contact Message](#sending-contact-message)
 - [Sending a Button Message](#sending-a-button-message)
 - [Validation Rules for Button Messages](#validation-rules-for-button-messages)
 - [Sending a List Message](#sending-a-list-message)
@@ -147,6 +148,201 @@ print("Response:", response)
 - [`send_text_message`](#sending-a-text-message)
 
 ---
+## Sending Contact Message
+
+The `send_contact_message` method allows you to send a contact message to a recipient on WhatsApp. The message includes contact details, such as name, phone numbers, addresses, emails, and other optional information.
+
+### Method Signature
+```python
+send_contact_message(
+    recipient_phone_number: str,
+    contact_data: dict,
+    context_message_id: Optional[str] = None
+) -> dict
+```
+
+---
+
+### Parameters
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., `1234567890`, without the `+`).
+- **`contact_data`** *(dict)*: A dictionary containing the contact details to send. The structure of `contact_data` should include the following:
+  - **`name`** *(dict)*: The contact's full name (required). The object can contain:
+    - `formatted_name`: Full name as it normally appears.
+    - `first_name`: First name (optional).
+    - `last_name`: Last name (optional).
+    - `middle_name`: Middle name (optional).
+    - `suffix`: Name suffix (optional).
+    - `prefix`: Name prefix (optional).
+  - **`phones`** *(list)*: A list of phone numbers (required). Each phone object can contain:
+    - `phone`: The phone number (required).
+    - `wa_id`: WhatsApp ID (optional).
+    - `type`: Phone type (optional; possible values: `CELL`, `MAIN`, `IPHONE`, `HOME`, `WORK`).
+  - **`addresses`** *(list, optional)*: A list of addresses (optional). Each address object can contain:
+    - `street`: Street name and number.
+    - `city`: City name.
+    - `state`: State abbreviation.
+    - `zip`: ZIP code.
+    - `country`: Country name.
+    - `country_code`: Two-letter country abbreviation.
+    - `type`: Address type (optional; possible values: `HOME`, `WORK`).
+  - **`birthday`** *(str, optional)*: The contact's birthday in `YYYY-MM-DD` format.
+  - **`emails`** *(list, optional)*: A list of emails (optional). Each email object can contain:
+    - `email`: Email address.
+    - `type`: Email type (optional; possible values: `HOME`, `WORK`).
+  - **`org`** *(dict, optional)*: Contact organization information (optional). The object can contain:
+    - `company`: Name of the contact's company.
+    - `department`: Name of the contact's department.
+    - `title`: The contact's business title.
+  - **`urls`** *(list, optional)*: A list of URLs (optional). Each URL object can contain:
+    - `url`: URL.
+    - `type`: URL type (optional; possible values: `HOME`, `WORK`).
+  
+- **`context_message_id`** *(str, optional)*: The message ID of a previous message, if you are sending the contact message as a reply to an existing message. Default is `None`.
+- **`kwargs`** *(optional)*: Additional fields for the contact message.
+
+---
+
+### Returns
+A dictionary containing the response from the WhatsApp Business API. The response will include a `message ID` for tracking.
+
+---
+
+### Example: Sending a Contact Message
+
+```python
+from whatsapp_api.message.messaging import MessagingClient
+
+access_token = "your_access_token_here"
+phone_number_id = "your_phone_number_id_here"
+
+# Initialize the MessagingClient
+client = MessagingClient(access_token, phone_number_id)
+
+contact_data = {
+    "name": {
+        "formatted_name": "John Doe",
+        "first_name": "John",
+        "last_name": "Doe",
+        "prefix": "Mr.",
+    },
+    "phones": [
+        {
+            "phone": "1234567890",
+            "wa_id": "1234567890",
+            "type": "HOME"
+        }
+    ],
+    "addresses": [
+        {
+            "street": "1234 Elm St",
+            "city": "Springfield",
+            "state": "IL",
+            "zip": "62701",
+            "country": "USA",
+            "country_code": "US",
+            "type": "HOME"
+        }
+    ],
+    "emails": [
+        {
+            "email": "john.doe@example.com",
+            "type": "HOME"
+        }
+    ],
+    "org": {
+        "company": "Example Inc.",
+        "department": "Marketing",
+        "title": "Manager"
+    },
+    "urls": [
+        {
+            "url": "https://www.johndoe.com",
+            "type": "WORK"
+        }
+    ]
+}
+
+
+
+# Send a contact message
+
+response = client.send_contact_message(
+    recipient_phone_number="9876543210",
+    contact_data=contact_data,
+    context_message_id="previous_message_id"
+)
+
+print("Response:", response)
+```
+
+---
+
+### Example Request Payload
+The payload sent to the API will look like this:
+
+```json
+{
+  "messaging_product": "whatsapp",
+  "to": "9876543210",
+  "type": "contacts",
+  "contacts": [
+    {
+      "name": {
+        "formatted_name": "John Doe",
+        "first_name": "John",
+        "last_name": "Doe",
+        "prefix": "Mr."
+      },
+      "phones": [
+        {
+          "phone": "1234567890",
+          "wa_id": "1234567890",
+          "type": "HOME"
+        }
+      ],
+      "addresses": [
+        {
+          "street": "1234 Elm St",
+          "city": "Springfield",
+          "state": "IL",
+          "zip": "62701",
+          "country": "USA",
+          "country_code": "US",
+          "type": "HOME"
+        }
+      ],
+      "emails": [
+        {
+          "email": "john.doe@example.com",
+          "type": "HOME"
+        }
+      ],
+      "org": {
+        "company": "Example Inc.",
+        "department": "Marketing",
+        "title": "Manager"
+      },
+      "urls": [
+        {
+          "url": "https://www.johndoe.com",
+          "type": "WORK"
+        }
+      ]
+    }
+  ]
+}
+```
+
+---
+
+### Notes
+- The `contact_data` dictionary must include at least a `name` object with a `formatted_name` and a `phones` array with at least one phone number.
+- All fields in the `contact_data` dictionary are optional except for `name` and `phones`.
+- The `context_message_id` is optional and is used to reply to a previous message.
+- The API will return a `message ID` for the sent contact message, which can be used for tracking.
+
+---
+
 ## Sending a Button Message
 
 The `send_button_message` method is used to send interactive button messages. These messages can contain up to 3 buttons that the recipient can tap.

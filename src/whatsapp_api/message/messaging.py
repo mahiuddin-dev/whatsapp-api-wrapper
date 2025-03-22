@@ -153,3 +153,47 @@ class MessagingClient(BaseClient):
             payload["interactive"]["footer"] = {"text": footer_text}
 
         return self._request("POST", self.endpoint, payload)
+
+    # Send a contact message to a recipient. 
+    def send_contact_message(self, recipient_phone_number, contact_data, context_message_id=None, **kwargs):
+        """
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param contact_data: A dictionary containing the contact details (e.g., name, phone, address, etc.).
+        :param context_message_id: (Optional) Message ID of a previous message to reply to.
+        :param kwargs: Additional fields for the contact message (e.g., custom fields for contacts).
+        :return: Response from the WhatsApp API.
+        :raises ValueError: If invalid parameters are used.
+        :raises Exception: If the API request fails.
+        """
+
+        # Validate required contact fields
+        if "name" not in contact_data or not contact_data["name"].get("formatted_name"):
+            raise ValueError("Contact data must include 'name' with a 'formatted_name' field.")
+        if "phones" not in contact_data or len(contact_data["phones"]) == 0:
+            raise ValueError("Contact data must include at least one 'phone'.")
+
+        # Prepare the contact object
+        contact_payload = {
+            "name": contact_data["name"],  # Name is required
+            "phones": contact_data.get("phones", []),  # List of phone numbers, optional but required if present
+            "addresses": contact_data.get("addresses", []),  # List of addresses (optional)
+            "birthday": contact_data.get("birthday"),  # Optional birthday in YYYY-MM-DD format
+            "emails": contact_data.get("emails", []),  # List of emails (optional)
+            "org": contact_data.get("org", {}),  # Organization details (optional)
+            "urls": contact_data.get("urls", [])  # List of URLs (optional)
+        }
+
+        # Construct the payload for the API request
+        payload = {
+            "messaging_product": "whatsapp",
+            "to": recipient_phone_number,
+            "type": "contacts",
+            "contacts": [contact_payload],
+        }
+
+        # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        # Send the request and return the response
+        return self._request("POST", self.endpoint, payload)

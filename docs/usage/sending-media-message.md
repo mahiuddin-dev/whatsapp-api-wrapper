@@ -12,7 +12,8 @@ This guide explains how to send media messages using the WhatsApp API Python Pac
 - [Retrieve Media URL by Media ID](#retrieve-media-url-by-media-id)
 - [Delete Media by Media ID](#delete-media-by-media-id)
 - [Download Media](#download-media)
-- [Sending Media Message](#sending-media-message-by-id)
+- [Sending Media Message By ID](#sending-media-message-by-id)
+- [Sending Media Message By URL](#sending-media-message-by-url)
 - [Response](#response)
 
 ---
@@ -474,32 +475,6 @@ print("Response:", response)
 
 ---
 
-
-
-## Response
-
-All methods return the API response as a dictionary. On success, the response typically includes a `message_id` or confirmation details.
-
-### Example Response
-```json
-{
-    "messaging_product": "whatsapp",
-    "contacts": [
-        {
-            "input": "1234567890",
-            "wa_id": "1234567890",
-            "messages": [
-                {
-                    "id": "wamid.HBgMNTk0Mxxxxxxxxxxxxxxxxxxxxxxxx"
-                }
-            ]
-        }
-    ]
-}
-```
-
----
-
 ## Sending Media Message by URL
 
 The `send_media_message_by_url` method is used to send various types of media messages (e.g., images, videos, documents, audio, stickers) to a recipient using a media URL.
@@ -587,6 +562,27 @@ print("Response:", response)
 - Media types such as `audio`, `sticker`, `image`, `document`, and `video` are supported.
 - If a `context_message_id` is provided, the media message will be sent as a reply to that specific message.
 
-```
+---
 
+## Response
+
+All methods return the API response as a dictionary. On success, the response typically includes a `message_id` or confirmation details.
+
+### Example Response
+```json
+{
+    "messaging_product": "whatsapp",
+    "contacts": [
+        {
+            "input": "1234567890",
+            "wa_id": "1234567890",
+            "messages": [
+                {
+                    "id": "wamid.HBgMNTk0Mxxxxxxxxxxxxxxxxxxxxxxxx"
+                }
+            ]
+        }
+    ]
+}
+```
 ---
