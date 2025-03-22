@@ -10,7 +10,6 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
 - [Sending a Text Message](#sending-a-text-message)
 - [Sending Media Message](./sending-media-message.md)
-- [Replying to a Text Message](#replying-to-a-text-message)
 - [Send Reaction Message](#send-reaction-message)
 - [Sending Contact Message](#sending-contact-message)
 - [Sending a Button Message](#sending-a-button-message)
@@ -53,6 +52,7 @@ send_text_message(recipient_phone_number: str, message: str, preview_url: bool =
 - **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
 - **`message`** *(str)*: The text message content.
 - **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
+- **`context_message_id`** *(str, optional)*: The message ID of a previous message, if you are sending the contact message as a reply to an existing message. Default is `None`.
 
 ### Example: Sending a Text Message
 ```python
@@ -64,46 +64,15 @@ response = client.send_text_message(recipient_phone_number, message)
 print("Response:", response)
 ```
 
----
-
-## Replying to a Text Message
-
-The `reply_text_message` method allows you to reply to a specific message in a WhatsApp conversation by referencing the message ID of the previous message.
-
-### Method Signature
+### Example: Sending a Reply Text Message
 ```python
-reply_text_message(recipient_phone_number: str, message: str, context_message_id: str, preview_url: bool = False) -> dict
-```
-
-### Parameters
-- ****`recipient_phone_number`**** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
-- ****`message`**** *(str)*: The reply message content. Maximum length is 4096 characters.
-- **`context_message_id`** *(str)*: The ID of the previous message in the conversation. This is required to thread the reply to the correct message.
-- **`preview_url`** *(bool)*: Whether to render a link preview for any URL in the body text string (optional). Default is **`False`**. If multiple URLs are in the body text string, only the first URL will be rendered.
-
-### Example: Replying to a Text Message
-```python
-recipient_phone_number = "1234567890"
-message = "Thank you for reaching out!"
-context_message_id = "abc123"
-
-# Reply to a text message
-response = client.reply_text_message(
-    recipient_phone_number=recipient_phone_number,
-    message=message,
-    context_message_id=context_message_id
+response = client.send_text_message(
+    recipient_phone_number = "1234567890",
+    message = "Hello from WhatsApp API!",
+    context_message_id="previous_message_id"
 )
 print("Response:", response)
 ```
-
-### Notes
-- The method references the previous message in the conversation using the `context_message_id`. This ensures that the reply is properly threaded.
-- The `preview_url` parameter enables link previews in the message body when set to **`True`**.
-
----
-
-### Related Methods
-- [`send_text_message`](#sending-a-text-message): Use this method to send plain text messages without referencing a previous message.
 
 ---
 
@@ -359,6 +328,7 @@ send_button_message(recipient_phone_number: str, text: str, buttons: list[dict])
   - **`reply`** *(dict)*:
     - **`id`** *(str)*: A unique identifier for the button.
     - **`title`** *(str)*: The button text (max 20 characters).
+- **`context_message_id`** *(str, optional)*: The message ID of a previous message, if you are sending the contact message as a reply to an existing message. Default is `None`.
 
 ### Example: Sending a Button Message
 
@@ -432,7 +402,7 @@ send_list_message(
 - **`button_cta`** *(str)*: The label text for the Call-To-Action button (max 20 characters).
 - **`header_text`** *(Optional[str])*: An optional header for the message (max 60 characters).
 - **`footer_text`** *(Optional[str])*: An optional footer for the message (max 60 characters).
-
+- **`context_message_id`** *(str, optional)*: The message ID of a previous message, if you are sending the contact message as a reply to an existing message. Default is `None`.
 
 ### Example: Sending a List Message
 ```python

@@ -14,13 +14,14 @@ class MessagingClient(BaseClient):
         self.endpoint = f"{phone_number_id}/messages"
 
     # Send Text Message
-    def send_text_message(self, recipient_phone_number, message, preview_url=False):
+    def send_text_message(self, recipient_phone_number, message, preview_url=False, context_message_id=None):
         """
         Send a text message.
 
         :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param message: The message content - Maximum 4096 characters.
         :param preview_url: Preview URL render a link preview of any URL in the body text string. (optional)
+        :param context_message_id: (Optional) Message ID of a previous message to reply to.
         :return: API response JSON
         """
 
@@ -34,6 +35,11 @@ class MessagingClient(BaseClient):
                 "body": message
             },
         }
+
+        # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
         return self._request("POST", self.endpoint, payload)
 
     # Send Reply to Text Message
@@ -90,13 +96,14 @@ class MessagingClient(BaseClient):
         return self._request("POST", self.endpoint, payload)
 
     # Send Interactive Message with Buttons
-    def send_button_message(self, recipient_phone_number, text, buttons):
+    def send_button_message(self, recipient_phone_number, text, buttons, context_message_id=None):
         """
         Send an interactive button message.
 
         :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
         :param text: The message text
         :param buttons: List of button dictionaries 
+        :param context_message_id: Optional message ID of a previous message to reply to.
         :return: API response JSON
         """
         # Validate the buttons
@@ -113,10 +120,15 @@ class MessagingClient(BaseClient):
                 "action": {"buttons": buttons},
             },
         }
+
+        # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
         return self._request("POST", self.endpoint, payload)
 
     # Send Interactive List Message with Header and Footer
-    def send_list_message(self, recipient_phone_number, body_text, sections, button_cta, header_text=None, footer_text=None):
+    def send_list_message(self, recipient_phone_number, body_text, sections, button_cta, header_text=None, footer_text=None, context_message_id=None):
         """
         Send an interactive list message.
 
@@ -126,6 +138,7 @@ class MessagingClient(BaseClient):
         :param button_cta: Button label text (CTA button).
         :param header_text: Optional header text (max 60 characters).
         :param footer_text: Optional footer text (max 60 characters).
+        :param context_message_id: Optional message ID of a previous message to reply to.
         :return: API response JSON.
         """
         # Validate the inputs
@@ -151,6 +164,10 @@ class MessagingClient(BaseClient):
         # Add optional footer
         if footer_text:
             payload["interactive"]["footer"] = {"text": footer_text}
+
+        # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
 
         return self._request("POST", self.endpoint, payload)
 

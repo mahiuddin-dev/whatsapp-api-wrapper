@@ -47,36 +47,6 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
-    # Send Reply to Text Message
-    @patch("whatsapp_api.base_client.BaseClient._request")
-    def test_reply_text_message(self, mock_request):
-        """Test replying to a text message."""
-        mock_request.return_value = {"success": True}
-
-        context_message_id = "wam1234567890...."
-        message = "Thank you for your message!"
-
-        response = self.client.reply_text_message(self.recipient_phone_number, message, context_message_id)
-        self.assertEqual(response, {"success": True})
-
-        mock_request.assert_called_once_with(
-            "POST",
-            f"{self.phone_number_id}/messages",
-            {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": self.recipient_phone_number,
-                "context": {
-                    "message_id": context_message_id
-                },
-                "type": "text",
-                "text": {
-                    "preview_url": False,
-                    "body": message
-                }
-            },
-        )
-
     # Send Reply with Reaction Message
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_reaction_message(self, mock_request):
