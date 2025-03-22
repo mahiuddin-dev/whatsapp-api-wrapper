@@ -234,3 +234,42 @@ class TestMediaClient(unittest.TestCase):
                 "Content-Type": "application/json",
             },
         )
+
+
+    @patch("requests.request")
+    def test_send_image_message_by_url_success(self, mock_request):
+        """Test successful image message sending via URL."""
+        # Mock successful API response
+        mock_request.return_value = MagicMock(
+            status_code=200,
+            json=lambda: {"messaging_product": "whatsapp", "messages": [{"id": "wamid.mock_message_id"}]},
+        )
+
+        # Call send_media_message_by_url
+        media_url = "https://example.com/media/image.jpg"
+        context_message_id = "mock_context_message_id"
+        response = self.media_client.send_media_message_by_url(
+            recipient_phone_number=self.recipient_phone_number,
+            media_url=media_url,
+            media_type="image",
+            context_message_id=context_message_id
+        )
+
+        # Assertions
+        self.assertEqual(response["messages"][0]["id"], "wamid.mock_message_id")
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.media_client.base_url}{self.media_client.message_endpoint}",
+            json={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "image",
+                "image": {"link": media_url},
+                "context": {"message_id": context_message_id}
+            },
+            headers={
+                "Authorization": f"Bearer {self.access_token}",
+                "Content-Type": "application/json",
+            },
+        )

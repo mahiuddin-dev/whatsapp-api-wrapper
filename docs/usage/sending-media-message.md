@@ -499,3 +499,94 @@ All methods return the API response as a dictionary. On success, the response ty
 ```
 
 ---
+
+## Sending Media Message by URL
+
+The `send_media_message_by_url` method is used to send various types of media messages (e.g., images, videos, documents, audio, stickers) to a recipient using a media URL.
+
+### Method Signature
+```python
+send_media_message_by_url(
+    recipient_phone_number: str,
+    media_url: str,
+    media_type: str,
+    context_message_id: Optional[str] = None,
+    **kwargs
+) -> dict
+```
+
+---
+
+### Parameters
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., `1234567890`, without the `+`).
+- **`media_url`** *(str)*: The URL of the media to be sent.
+- **`media_type`** *(str)*: The type of media to be sent. Supported types:
+  - `image`
+  - `audio`
+  - `document`
+  - `sticker`
+  - `video`
+- **`context_message_id`** *(str, optional)*: The message ID of the previous message, if you are sending the media as a reply. Default is `None`.
+- **`kwargs`** *(optional)*: Additional fields based on the media type:
+  - **`caption`** *(str)*: A caption for the media (only applicable for `image`, `video`, and `document`). Default is `None`.
+  - **`filename`** *(str)*: The filename for the document (only applicable for `document`). Default is `None`.
+
+---
+
+### Returns
+A dictionary containing the response from the WhatsApp Business API, including the `message ID` for tracking.
+
+---
+
+### Supported Media Types and Payload Structure
+| Media Type  | Additional Fields |
+|-------------|-------------------|
+| `audio`     | None              |
+| `sticker`   | None              |
+| `image`     | `caption`         |
+| `document`  | `caption`         |
+| `video`     | `caption`         |
+
+---
+
+### Example: Sending an Image from a URL
+```python
+recipient_phone_number = "1234567890"
+media_url = "https://example.com/media/image.jpg"
+
+# Send an image
+response = media_client.send_media_message_by_url(
+    recipient_phone_number=recipient_phone_number,
+    media_url=media_url,
+    media_type="image"
+)
+print("Response:", response)
+```
+
+---
+
+### Example: Sending a Document from a URL
+```python
+recipient_phone_number = "1234567890"
+media_url = "https://example.com/media/document.pdf"
+
+# Send a document
+response = media_client.send_media_message_by_url(
+    recipient_phone_number=recipient_phone_number,
+    media_url=media_url,
+    media_type="document",
+    caption="Here is the document you requested."
+)
+print("Response:", response)
+```
+
+---
+
+### Notes
+- The `media_url` must be a publicly accessible URL.
+- Media types such as `audio`, `sticker`, `image`, `document`, and `video` are supported.
+- If a `context_message_id` is provided, the media message will be sent as a reply to that specific message.
+
+```
+
+---
