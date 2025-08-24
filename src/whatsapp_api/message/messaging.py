@@ -3,15 +3,33 @@ from whatsapp_api.message.validation import validate_buttons, validate_list_mess
 
 
 class MessagingClient(BaseClient):
-    def __init__(self, access_token, phone_number_id):
+    def __init__(self, access_token, phone_number_id, version="v21.0"):
         """
         Messaging client for WhatsApp.
 
         :param access_token: Meta API access token
         :param phone_number_id: Phone number ID from WhatsApp
         """
-        super().__init__(access_token)
+        super().__init__(access_token, version)
         self.endpoint = f"{phone_number_id}/messages"
+
+    # Mark Message as Read and typing indicator
+    def mark_message_as_read(self, message_id):
+        """
+        Mark a message as read.
+
+        :param message_id: The ID of the message to mark as read.
+        :return: API response JSON
+        """
+        payload = {
+            "messaging_product": "whatsapp",
+            "status": "read",
+            "message_id": message_id,
+            "typing_indicator": {
+                "type": "text"
+            }
+        }
+        return self._request("POST", self.endpoint, payload)
 
     # Send Text Message
     def send_text_message(self, recipient_phone_number, message, preview_url=False, context_message_id=None):

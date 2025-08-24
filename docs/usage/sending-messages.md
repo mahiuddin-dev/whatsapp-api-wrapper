@@ -8,6 +8,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 ## Table of Contents
 
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
+- [Mark as Read and Typing Indicator](#)
 - [Sending a Text Message](#sending-a-text-message)
 - [Sending Media Message](./sending-media-message.md)
 - [Send Reaction Message](#send-reaction-message)
@@ -36,6 +37,20 @@ phone_number_id = "your_phone_number_id_here"
 # Initialize the MessagingClient
 client = MessagingClient(access_token, phone_number_id)
 ```
+
+---
+## Mark Message as Read and Typing Indicator
+The `mark_message_as_read` method used to message read status and a reply typing indicator.
+
+### Method Signature
+```python
+mark_message_as_read(
+    context_message_id: str
+) -> dict
+```
+
+### Parameters
+- **`context_message_id`** *(str)*: The message ID of a previous message.
 
 ---
 
