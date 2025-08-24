@@ -7,7 +7,7 @@ A Python wrapper for the Meta WhatsApp Business API. This package allows develop
 
 For detailed usage instructions, examples, and validation rules, check out the full documentation:
 
-- [View Documentation](./docs/index.md)
+- [View Documentation](https://github.com/mahiuddin-dev/whatsapp-api-wrapper/blob/main/docs/index.md)
 
 
 ## Installation
