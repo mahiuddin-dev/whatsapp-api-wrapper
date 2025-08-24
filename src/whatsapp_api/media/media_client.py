@@ -5,14 +5,14 @@ from whatsapp_api.base_client import BaseClient
 
 
 class MediaClient(BaseClient):
-    def __init__(self, access_token, phone_number_id):
+    def __init__(self, access_token, phone_number_id, version="v21.0"):
         """
         Media client for WhatsApp.
 
         :param access_token: Meta API access token
         :param phone_number_id: Phone number ID from WhatsApp
         """
-        super().__init__(access_token)
+        super().__init__(access_token, version)
         self.phone_number_id = phone_number_id
         self.endpoint = f"{phone_number_id}/media"
         self.message_endpoint = f"{phone_number_id}/messages"
