@@ -1,3 +1,5 @@
+import random
+import string
 from whatsapp_api.base_client import BaseClient
 from whatsapp_api.message.validation import validate_buttons, validate_list_message
 
@@ -350,6 +352,93 @@ class MessagingClient(BaseClient):
         }
 
         # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        return self._request("POST", self.endpoint, payload)
+
+    # Send flow message
+    def send_flow_message(
+        self,
+        recipient_phone_number,
+        body_text,
+        flow_cta,
+        mode="published",
+        flow_action="navigate",
+        flow_id=None,
+        flow_name=None,
+        header_text=None,
+        footer_text=None,
+        flow_token=None,
+        flow_action_payload=None,
+        context_message_id=None,
+    ):
+        """
+        Send an interactive Flow message.
+
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param body_text: Body text of the Flow message. Maximum 1024 characters.
+        :param flow_cta: CTA button text (30 characters or less, no emoji advised).
+        :param mode: Flow mode, "draft" or "published". Defaults to "published".
+        :param flow_action: Flow action, either "navigate" or "data_exchange". Defaults to "navigate".
+        :param flow_id: Unique Flow ID provided by WhatsApp. Required if flow_name is not provided.
+        :param flow_name: Name of the Flow. Required if flow_id is not provided.
+        :param header_text: Optional header text.
+        :param footer_text: Optional footer text.
+        :param flow_token: Optional flow token string. If not provided, a random token will be generated.
+        :param flow_action_payload: Optional payload dict for flow action. Should include "screen" and optional "data".
+        :param context_message_id: Optional message ID of a previous message to reply to.
+        :return: API response JSON
+        """
+
+        if not (flow_id or flow_name):
+            raise ValueError("Either flow_id or flow_name must be provided.")
+        
+        # flow CTA max length 30 characters
+        if len(flow_cta) > 30:
+            raise ValueError("Flow CTA exceeds maximum length of 30 characters.")
+        # body text max length 1024 characters
+        if len(body_text) > 1024:
+            raise ValueError("Body text exceeds maximum length of 1024 characters.")
+
+        interactive = {
+            "type": "flow",
+            "body": {"text": body_text},
+            "action": {
+                "name": "flow",
+                "parameters": {
+                    "flow_message_version": "3",
+                    "flow_cta": flow_cta,
+                    "flow_action": flow_action,
+                    "mode": mode
+                },
+            },
+        }
+
+        if flow_id:
+            interactive["action"]["parameters"]["flow_id"] = str(flow_id)
+        if flow_name:
+            interactive["action"]["parameters"]["flow_name"] = flow_name
+        if header_text:
+            interactive["header"] = {"type": "text", "text": header_text}
+        if footer_text:
+            interactive["footer"] = {"text": footer_text}
+        if flow_token:
+            interactive["action"]["parameters"]["flow_token"] = flow_token
+        else:
+            random_id = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(10))
+            interactive["action"]["parameters"]["flow_token"] = random_id
+        if flow_action_payload:
+            interactive["action"]["parameters"]["flow_action_payload"] = flow_action_payload
+
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone_number,
+            "type": "interactive",
+            "interactive": interactive,
+        }
+
         if context_message_id:
             payload["context"] = {"message_id": context_message_id}
 

@@ -272,5 +272,73 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Flow Message
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_send_flow_message(self, mock_request):
+        """Test sending a flow message."""
+        mock_request.return_value = {"success": True}
+
+        body_text = "Flow message body"
+        flow_cta = "Book!"
+        flow_action = "navigate"
+        flow_id = "1"
+        header_text = "Flow message header"
+        footer_text = "Flow message footer"
+        flow_token = "AQAAAAACS5FpgQ_cAAAAAD0QI3s."
+        flow_action_payload = {
+            "screen": "FIRST_ENTRY_SCREEN",
+            "data": {
+                "product_name": "name",
+                "product_description": "description",
+                "product_price": 100,
+            },
+        }
+        context_message_id = "previous_message_id"
+
+        response = self.client.send_flow_message(
+            recipient_phone_number=self.recipient_phone_number,
+            body_text=body_text,
+            flow_cta=flow_cta,
+            flow_action=flow_action,
+            flow_id=flow_id,
+            header_text=header_text,
+            footer_text=footer_text,
+            flow_token=flow_token,
+            flow_action_payload=flow_action_payload,
+            context_message_id=context_message_id,
+        )
+
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.phone_number_id}/messages",
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "interactive",
+                "interactive": {
+                    "type": "flow",
+                    "header": {"type": "text", "text": header_text},
+                    "body": {"text": body_text},
+                    "footer": {"text": footer_text},
+                    "action": {
+                        "name": "flow",
+                        "parameters": {
+                            "flow_message_version": "3",
+                            "flow_cta": flow_cta,
+                            "flow_action": flow_action,
+                            "mode": "published",
+                            "flow_id": flow_id,
+                            "flow_token": flow_token,
+                            "flow_action_payload": flow_action_payload,
+                        },
+                    },
+                },
+                "context": {"message_id": context_message_id},
+            },
+        )
+
 if __name__ == "__main__":
     unittest.main()
