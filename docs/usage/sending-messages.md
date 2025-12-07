@@ -17,6 +17,8 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Validation Rules for Button Messages](#validation-rules-for-button-messages)
 - [Sending a List Message](#sending-a-list-message)
 - [Validation Rules for List Messages](#validation-rules-for-list-messages)
+- [Sending a Location Message](#sending-a-location-message)
+- [Sending a Location Request Message](#sending-a-location-request-message)
 - [Sending an Interactive Catalog Message](#sending-an-interactive-catalog-message)
 - [Response](#response)
 
@@ -482,6 +484,123 @@ try:
     client.send_list_message("1234567890", "Choose an option:", sections, "Options")
 except ValueError as e:
     print("Validation Error:", e)
+```
+
+---
+
+## Sending a Location Message
+
+The `send_location_message` method sends a precise latitude/longitude location to a WhatsApp user.
+
+### Method Signature
+```python
+send_location_message(
+    recipient_phone_number: str,
+    latitude: str | float,
+    longitude: str | float,
+    name: Optional[str] = None,
+    address: Optional[str] = None,
+    context_message_id: Optional[str] = None,
+) -> dict
+```
+
+### Parameters
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`latitude`** *(str | float)*: Location latitude in decimal degrees (required).
+- **`longitude`** *(str | float)*: Location longitude in decimal degrees (required).
+- **`name`** *(str, optional)*: Optional location name.
+- **`address`** *(str, optional)*: Optional location address.
+- **`context_message_id`** *(str, optional)*: Message ID of a previous message if replying within an existing thread. Default is `None`.
+
+### Example: Sending a Location Message
+```python
+recipient_phone_number = "1234567890"
+
+response = client.send_location_message(
+    recipient_phone_number=recipient_phone_number,
+    latitude="37.7749",
+    longitude="-122.4194",
+    name="Golden Gate Park",
+    address="San Francisco, CA",
+    context_message_id="previous_message_id"
+)
+
+print("Response:", response)
+```
+
+### Example Request Payload
+```json
+{
+  "messaging_product": "whatsapp",
+  "recipient_type": "individual",
+  "to": "1234567890",
+  "type": "location",
+  "location": {
+    "latitude": "37.7749",
+    "longitude": "-122.4194",
+    "name": "Golden Gate Park",
+    "address": "San Francisco, CA"
+  },
+  "context": {
+    "message_id": "previous_message_id"
+  }
+}
+```
+
+---
+
+## Sending a Location Request Message
+
+The `send_location_request_message` method asks the user to share their location via the WhatsApp interactive "Send Location" flow.
+
+### Method Signature
+```python
+send_location_request_message(
+    recipient_phone_number: str,
+    body_text: str,
+    context_message_id: Optional[str] = None,
+) -> dict
+```
+
+### Parameters
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`body_text`** *(str)*: The body text for the prompt (max 1024 characters).
+- **`context_message_id`** *(str, optional)*: Message ID of a previous message if replying within an existing thread. Default is `None`.
+
+### Example: Sending a Location Request Message
+```python
+recipient_phone_number = "1234567890"
+body_text = "Please share your location to find nearby stores."
+
+response = client.send_location_request_message(
+    recipient_phone_number=recipient_phone_number,
+    body_text=body_text,
+    context_message_id="previous_message_id"
+)
+
+print("Response:", response)
+```
+
+### Example Request Payload
+```json
+{
+  "messaging_product": "whatsapp",
+  "recipient_type": "individual",
+  "to": "1234567890",
+  "type": "interactive",
+  "interactive": {
+    "type": "location_request_message",
+    "body": {
+      "text": "Please share your location to find nearby stores."
+    },
+    "action": {
+      "name": "send_location"
+    }
+  },
+  "context": {
+    "message_id": "previous_message_id"
+  }
+}
 ```
 
 ---

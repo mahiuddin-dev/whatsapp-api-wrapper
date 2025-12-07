@@ -47,6 +47,79 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Location Message
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_send_location_message(self, mock_request):
+        """Test sending a location message."""
+        mock_request.return_value = {"success": True}
+
+        latitude = 37.7749
+        longitude = -122.4194
+        name = "Golden Gate Park"
+        address = "San Francisco, CA"
+        context_message_id = "previous_message_id"
+
+        response = self.client.send_location_message(
+            recipient_phone_number=self.recipient_phone_number,
+            latitude=latitude,
+            longitude=longitude,
+            name=name,
+            address=address,
+            context_message_id=context_message_id,
+        )
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.phone_number_id}/messages",
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "location",
+                "location": {
+                    "latitude": str(latitude),
+                    "longitude": str(longitude),
+                    "name": name,
+                    "address": address,
+                },
+                "context": {"message_id": context_message_id},
+            },
+        )
+
+    # Send Location Request Message
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_send_location_request_message(self, mock_request):
+        """Test sending an interactive location request message."""
+        mock_request.return_value = {"success": True}
+
+        body_text = "Please share your location to find nearby stores."
+        context_message_id = "previous_message_id"
+
+        response = self.client.send_location_request_message(
+            recipient_phone_number=self.recipient_phone_number,
+            body_text=body_text,
+            context_message_id=context_message_id,
+        )
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.phone_number_id}/messages",
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "interactive",
+                "interactive": {
+                    "type": "location_request_message",
+                    "body": {"text": body_text},
+                    "action": {"name": "send_location"},
+                },
+                "context": {"message_id": context_message_id},
+            },
+        )
+
     # Send Interactive Catalog Message
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_interactive_catalog_message(self, mock_request):

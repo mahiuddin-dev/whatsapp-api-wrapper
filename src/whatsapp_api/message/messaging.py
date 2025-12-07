@@ -280,3 +280,77 @@ class MessagingClient(BaseClient):
             payload["context"] = {"message_id": context_message_id}
 
         return self._request("POST", self.endpoint, payload)
+
+    # Send a location message
+    def send_location_message(self, recipient_phone_number, latitude, longitude, name=None, address=None, context_message_id=None):
+        """
+        Send a location message with latitude and longitude coordinates.
+
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param latitude: Location latitude in decimal degrees.
+        :param longitude: Location longitude in decimal degrees.
+        :param name: Optional location name.
+        :param address: Optional location address.
+        :param context_message_id: Optional message ID of a previous message to reply to.
+        :return: API response JSON
+        """
+        location_payload = {
+            "latitude": str(latitude),
+            "longitude": str(longitude),
+        }
+
+        if name:
+            location_payload["name"] = name
+        if address:
+            location_payload["address"] = address
+
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone_number,
+            "type": "location",
+            "location": location_payload,
+        }
+
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        return self._request("POST", self.endpoint, payload)
+
+    # location request messages 
+    def send_location_request_message(self, recipient_phone_number, body_text, context_message_id=None):
+        """
+        Send an interactive location request message.
+
+        :param recipient_phone_number: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+        :param body_text: The body text of the location request message. Maximum 1024 characters.
+        :param context_message_id: Optional message ID of a previous message to reply to.
+        :return: API response JSON
+        """
+
+        # Maximum 1024 characters.
+        if len(body_text) > 1024:
+            raise ValueError("Body text exceeds maximum length of 1024 characters.")
+
+        # Prepare the payload
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": recipient_phone_number,
+            "type": "interactive",
+            "interactive": {
+                "type": "location_request_message",
+                "body": {
+                    "text": body_text
+                },
+                "action": {
+                "name": "send_location"
+                }
+            }
+        }
+
+        # Add context if provided (optional)
+        if context_message_id:
+            payload["context"] = {"message_id": context_message_id}
+
+        return self._request("POST", self.endpoint, payload)
