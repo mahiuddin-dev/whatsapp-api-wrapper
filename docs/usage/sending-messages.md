@@ -8,7 +8,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 ## Table of Contents
 
 - [Initializing the MessagingClient](#initializing-the-messagingclient)
-- [Mark as Read and Typing Indicator](#)
+- [Mark as Read and Typing Indicator](#mark-message-as-read-and-typing-indicator)
 - [Sending a Text Message](#sending-a-text-message)
 - [Sending Media Message](./sending-media-message.md)
 - [Send Reaction Message](#send-reaction-message)
