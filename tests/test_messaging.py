@@ -47,6 +47,47 @@ class TestMessagingClient(unittest.TestCase):
             },
         )
 
+    # Send Interactive Catalog Message
+    @patch("whatsapp_api.base_client.BaseClient._request")
+    def test_send_interactive_catalog_message(self, mock_request):
+        """Test sending an interactive catalog message."""
+        mock_request.return_value = {"success": True}
+
+        body_text = "Explore our featured planter"
+        product_retailer_id = 12345
+        footer_text = "Limited time offer"
+        context_message_id = "previous_message_id"
+
+        response = self.client.send_interactive_catalog_message(
+            recipient_phone_number=self.recipient_phone_number,
+            body_text=body_text,
+            product_retailer_id=product_retailer_id,
+            footer_text=footer_text,
+            context_message_id=context_message_id,
+        )
+        self.assertEqual(response, {"success": True})
+
+        mock_request.assert_called_once_with(
+            "POST",
+            f"{self.phone_number_id}/messages",
+            {
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": self.recipient_phone_number,
+                "type": "interactive",
+                "interactive": {
+                    "type": "catalog_message",
+                    "body": {"text": body_text},
+                    "action": {
+                        "name": "catalog_message",
+                        "product_retailer_id": str(product_retailer_id),
+                    },
+                    "footer": {"text": footer_text},
+                },
+                "context": {"message_id": context_message_id},
+            },
+        )
+
     # Send Reply with Reaction Message
     @patch("whatsapp_api.base_client.BaseClient._request")
     def test_send_reaction_message(self, mock_request):

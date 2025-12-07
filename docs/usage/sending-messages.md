@@ -17,6 +17,7 @@ This guide explains how to send different types of messages using the WhatsApp A
 - [Validation Rules for Button Messages](#validation-rules-for-button-messages)
 - [Sending a List Message](#sending-a-list-message)
 - [Validation Rules for List Messages](#validation-rules-for-list-messages)
+- [Sending an Interactive Catalog Message](#sending-an-interactive-catalog-message)
 - [Response](#response)
 
 ---
@@ -481,6 +482,47 @@ try:
     client.send_list_message("1234567890", "Choose an option:", sections, "Options")
 except ValueError as e:
     print("Validation Error:", e)
+```
+
+---
+
+## Sending an Interactive Catalog Message
+
+The `send_interactive_catalog_message` method sends a catalog message that highlights a single product from your WhatsApp catalog.
+
+### Method Signature
+```python
+send_interactive_catalog_message(
+    recipient_phone_number: str,
+    body_text: str,
+    product_retailer_id: str,
+    footer_text: Optional[str] = None,
+    context_message_id: Optional[str] = None,
+) -> dict
+```
+
+### Parameters
+- **`recipient_phone_number`** *(str)*: The recipient's WhatsApp phone number in international format (e.g., 1234567890, without the +).
+- **`body_text`** *(str)*: The text shown above the catalog item. Maximum 1024 characters.
+- **`product_retailer_id`** *(str)*: The retailer ID of the product you want to feature.
+- **`footer_text`** *(str, optional)*: Optional footer text for the message (max 60 characters).
+- **`context_message_id`** *(str, optional)*: Message ID of a previous message if replying within an existing thread.
+
+### Example: Sending an Interactive Catalog Message
+```python
+recipient_phone_number = "1234567890"
+body_text = "Explore our featured planter"
+product_retailer_id = "SKU-PLANTER-001"
+
+response = client.send_interactive_catalog_message(
+    recipient_phone_number=recipient_phone_number,
+    body_text=body_text,
+    product_retailer_id=product_retailer_id,
+    footer_text="Limited time offer",
+    context_message_id="previous_message_id"
+)
+
+print("Response:", response)
 ```
 
 ---
