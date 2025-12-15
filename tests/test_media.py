@@ -122,7 +122,17 @@ class TestMediaClient(unittest.TestCase):
         response = self.media_client.get_media_url(media_id)
 
         # Assertions
-        self.assertEqual(response, "<URL>")
+        self.assertEqual(
+            response,
+            {
+                "messaging_product": "whatsapp",
+                "url": "<URL>",
+                "mime_type": "image/jpeg",
+                "sha256": "<HASH>",
+                "file_size": "303833",
+                "id": "2621233374848975"
+            },
+        )
         mock_request.assert_called_once_with(
             "GET",
             f"{self.media_client.base_url}{media_id}?phone_number_id={self.phone_number_id}",
@@ -141,20 +151,19 @@ class TestMediaClient(unittest.TestCase):
         mock_request.return_value = MagicMock(
             status_code=200,
             content=b"mock media content",
+            headers={"Content-Type": "image/jpeg"},
         )
 
         media_url = "https://example.com/media/sample.jpg"
         response = self.media_client.get_media_content(media_url)
 
-        self.assertEqual(response, b"mock media content")
+        self.assertEqual(response.content, b"mock media content")
+        self.assertEqual(response.content_type, "image/jpeg")
         mock_request.assert_called_once_with(
             "GET",
-            f"{self.media_client.base_url}{media_url}",
+            media_url,
             json=None,
-            headers={
-                "Authorization": f"Bearer {self.access_token}",
-                "Content-Type": "application/json",
-            },
+            headers={"Authorization": f"Bearer {self.access_token}"},
         )
     # Download media from URL
     @patch("requests.request")
@@ -164,21 +173,22 @@ class TestMediaClient(unittest.TestCase):
         mock_request.return_value = MagicMock(
             status_code=200,
             content=b"mock file content",
-            headers={"Content-Disposition": "attachment; filename=sample.jpg"},
+            headers={
+                "Content-Disposition": "attachment; filename=sample.jpg",
+                "Content-Type": "image/jpeg",
+            },
         )
 
         media_url = "https://example.com/media/sample.jpg"
         response = self.media_client.download_media(media_url)
 
-        self.assertEqual(response, b"mock file content")
+        self.assertEqual(response.content, b"mock file content")
+        self.assertEqual(response.content_type, "image/jpeg")
         mock_request.assert_called_once_with(
             "GET",
-            f"{self.media_client.base_url}{media_url}",
+            media_url,
             json=None,
-            headers={
-                "Authorization": f"Bearer {self.access_token}",
-                "Content-Type": "application/json",
-            },
+            headers={"Authorization": f"Bearer {self.access_token}"},
         )
 
     @patch("requests.request")

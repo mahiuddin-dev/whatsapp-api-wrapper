@@ -237,12 +237,13 @@ except Exception as e:
 ## Retrieve Media Content by Media URL
 
 Use the `get_media_content` method to fetch the binary media content from a media URL. This URL is typically obtained via [`get_media_url`](#retrieve-media-url-by-media-id) and expires after **5 minutes**, so fetch promptly or re-request if needed.
+Pass the full media URL returned by the API—no additional base URL is required.
 
 ---
 
 ### Method Signature
 ```python
-get_media_content(media_url: str) -> dict
+get_media_content(media_url: str) -> MediaResponse
 ```
 
 ---
@@ -253,14 +254,9 @@ get_media_content(media_url: str) -> dict
 ---
 
 ### Returns
-Dictionary with the media bytes and content type:
-```json
-{
-  "content": "<binary content>",
-  "content_type": "image/jpeg"
-}
-```
-Use `content` for the raw bytes and `content_type` to preserve the original MIME type.
+`MediaResponse` with:
+- `content` (`bytes`): Raw media bytes.
+- `content_type` (`str`): MIME type returned by the server.
 
 ---
 
@@ -278,14 +274,13 @@ media_id = "2621233374848975"
 media_meta = media_client.get_media_url(media_id)
 media_url = media_meta["url"]
 
-# 2) Fetch the media content dict
+# 2) Fetch the media content and content type
 media_response = media_client.get_media_content(media_url)
-content_bytes = media_response["content"]
-content_type = media_response["content_type"]
+content_bytes = media_response.content
+content_type = media_response.content_type
 
 # Optional: save to a file
-extension = ".jpg" if content_type == "image/jpeg" else ""
-with open(f"downloaded_media{extension}", "wb") as file:
+with open("downloaded_media", "wb") as file:
     file.write(content_bytes)
 ```
 
@@ -357,11 +352,12 @@ except Exception as e:
 ---
 ## Download Media
 
-The `download_media` method is used to download media files from a given URL retrieved through the [Retrieve Media URL](#retrieve-media-url-by-media-id) method. Since media URLs expire after **5 minutes**, you may need to retrieve a fresh URL if downloading fails due to expiration. This is a convenience alias for [`get_media_content`](#retrieve-media-content-by-media-url) and returns the same structure.
+The `download_media` method is used to download media files from a given URL retrieved through the [Retrieve Media URL](#retrieve-media-url-by-media-id) method. Since media URLs expire after **5 minutes**, you may need to retrieve a fresh URL if downloading fails due to expiration. This is a convenience alias for [`get_media_content`](#retrieve-media-content-by-media-url) and returns the same binary data.
+Pass the absolute media URL returned by the API; the client will request it directly.
 
 ### Method Signature
 ```python
-download_media(media_url: str) -> dict
+download_media(media_url: str) -> MediaResponse
 ```
 
 ---
@@ -372,7 +368,7 @@ download_media(media_url: str) -> dict
 ---
 
 ### Returns
-Dictionary containing:
+`MediaResponse` containing:
 - `content` (`bytes`): Raw media bytes.
 - `content_type` (`str`): MIME type returned by the server.
 Functionally identical to `get_media_content`.
@@ -393,8 +389,8 @@ media_client = MediaClient(access_token, phone_number_id)
 media_meta = media_client.get_media_url("2621233374848975")
 media_url = media_meta["url"]
 download = media_client.download_media(media_url)
-content_bytes = download["content"]
-content_type = download["content_type"]
+content_bytes = download.content
+content_type = download.content_type
 
 ```
 

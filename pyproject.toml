@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "whatsapp-api-connect"
-version = "0.0.6"
+version = "0.0.7"
 description = "Python wrapper for the Meta WhatsApp API"
 readme = "README.md"
 authors = [{ name = "Md Mahiuddin", email = "dev.mahiuddin@gmail.com" }]

@@ -96,7 +96,7 @@ class MediaClient(BaseClient):
         Get the media content from the given media URL.
 
         :param media_url: URL of the media to retrieve.
-        :return: Binary data of the media.
+        :return: MediaResponse containing bytes and content type.
         :raises Exception: If the API request fails.
         """
         return self._request("GET", media_url, is_media=True)
@@ -107,7 +107,7 @@ class MediaClient(BaseClient):
         Download media from the given URL.
 
         :param media_url: URL of the media to download.
-        :return: Binary data of the media.
+        :return: MediaResponse containing bytes and content type.
         :raises Exception: If the download fails.
         """
         return self._request("GET", media_url, is_media=True)
