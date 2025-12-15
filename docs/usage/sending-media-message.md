@@ -10,6 +10,7 @@ This guide explains how to send media messages using the WhatsApp API Python Pac
 - [Initializing the MediaClient](#initializing-the-mediaclient)
 - [Upload Media](#upload-media)
 - [Retrieve Media URL by Media ID](#retrieve-media-url-by-media-id)
+- [Retrieve Media Content by Media URL](#retrieve-media-content-by-media-url)
 - [Delete Media by Media ID](#delete-media-by-media-id)
 - [Download Media](#download-media)
 - [Sending Media Message By ID](#sending-media-message-by-id)
@@ -233,6 +234,71 @@ except Exception as e:
 
 ---
 
+## Retrieve Media Content by Media URL
+
+Use the `get_media_content` method to fetch the binary media content from a media URL. This URL is typically obtained via [`get_media_url`](#retrieve-media-url-by-media-id) and expires after **5 minutes**, so fetch promptly or re-request if needed.
+
+---
+
+### Method Signature
+```python
+get_media_content(media_url: str) -> dict
+```
+
+---
+
+### Parameters
+- `media_url` *(str)*: The temporary media URL returned by `get_media_url`.
+
+---
+
+### Returns
+Dictionary with the media bytes and content type:
+```json
+{
+  "content": "<binary content>",
+  "content_type": "image/jpeg"
+}
+```
+Use `content` for the raw bytes and `content_type` to preserve the original MIME type.
+
+---
+
+### Example Usage
+```python
+from whatsapp_api.media.media_client import MediaClient
+
+access_token = "your_meta_api_access_token"
+phone_number_id = "your_phone_number_id"
+
+media_client = MediaClient(access_token, phone_number_id)
+
+# 1) Retrieve the short-lived media URL
+media_id = "2621233374848975"
+media_meta = media_client.get_media_url(media_id)
+media_url = media_meta["url"]
+
+# 2) Fetch the media content dict
+media_response = media_client.get_media_content(media_url)
+content_bytes = media_response["content"]
+content_type = media_response["content_type"]
+
+# Optional: save to a file
+extension = ".jpg" if content_type == "image/jpeg" else ""
+with open(f"downloaded_media{extension}", "wb") as file:
+    file.write(content_bytes)
+```
+
+---
+
+### Related Methods
+- [`get_media_url`](#retrieve-media-url-by-media-id) – Get the URL used as input here.
+- [`download_media`](#download-media) – Alias with the same behavior as `get_media_content`.
+
+---
+
+---
+
 ### Delete Media by Media ID
 
 The `delete_media` method is used to delete a media file from the Meta API by providing a media ID. This media ID is obtained after uploading the media using the WhatsApp Business API. Once deleted, the media file will no longer be accessible.
@@ -291,11 +357,11 @@ except Exception as e:
 ---
 ## Download Media
 
-The `download_media` method is used to download media files from a given URL retrieved through the [Retrieve Media URL](#retrieve-media-url-by-media-id) method. Since media URLs expire after **5 minutes**, you may need to retrieve a fresh URL if downloading fails due to expiration. 
+The `download_media` method is used to download media files from a given URL retrieved through the [Retrieve Media URL](#retrieve-media-url-by-media-id) method. Since media URLs expire after **5 minutes**, you may need to retrieve a fresh URL if downloading fails due to expiration. This is a convenience alias for [`get_media_content`](#retrieve-media-content-by-media-url) and returns the same structure.
 
 ### Method Signature
 ```python
-download_media(media_url: str) -> bytes
+download_media(media_url: str) -> dict
 ```
 
 ---
@@ -306,7 +372,10 @@ download_media(media_url: str) -> bytes
 ---
 
 ### Returns
-Binary data (`bytes`) representing the media file.
+Dictionary containing:
+- `content` (`bytes`): Raw media bytes.
+- `content_type` (`str`): MIME type returned by the server.
+Functionally identical to `get_media_content`.
 
 Upon a successful request, the media content is returned as raw binary data. You can save this data to a file or process it further.
 
@@ -321,8 +390,11 @@ access_token = "your_meta_api_access_token"
 phone_number_id = "your_phone_number_id"
 
 media_client = MediaClient(access_token, phone_number_id)
-media_url = <URL>
+media_meta = media_client.get_media_url("2621233374848975")
+media_url = media_meta["url"]
 download = media_client.download_media(media_url)
+content_bytes = download["content"]
+content_type = download["content_type"]
 
 ```
 
@@ -332,12 +404,13 @@ download = media_client.download_media(media_url)
 Since **media URLs expire after 5 minutes**, follow this approach:
 
 1. **Retrieve the media URL using `get_media_url(media_id)`**.
-2. **Immediately download the media file using `download_media(media_url)`**.
+2. **Immediately download the media file using `get_media_content(media_url)` or `download_media(media_url)`**.
 3. **If you get a `404 Not Found` error, retrieve a new media URL and try again.**
 ---
 
 ### Related Methods
 - [`get_media_url`](#retrieve-media-url-by-media-id) – Retrieve the media URL before downloading.
+- [`get_media_content`](#retrieve-media-content-by-media-url) – Alias with the same behavior as `download_media`.
 
 ---
 

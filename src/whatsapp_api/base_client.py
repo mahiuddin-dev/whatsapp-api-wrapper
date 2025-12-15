@@ -34,7 +34,10 @@ class BaseClient:
         # If response successful, return the JSON response
         if response.status_code == 200:
             if is_media:
-                return response.content
+                return {
+                    "content": response.content,
+                    "content_type": response.headers.get("Content-Type", "")
+                }
             return response.json()
 
         # Handle rate limiting or other errors

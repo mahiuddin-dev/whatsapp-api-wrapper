@@ -90,6 +90,17 @@ class MediaClient(BaseClient):
         response = self._request("GET", endpoint)
         return response
 
+    # Retrieve Media Content by Media URL
+    def get_media_content(self, media_url):
+        """
+        Get the media content from the given media URL.
+
+        :param media_url: URL of the media to retrieve.
+        :return: Binary data of the media.
+        :raises Exception: If the API request fails.
+        """
+        return self._request("GET", media_url, is_media=True)
+
     # Download Media
     def download_media(self, media_url):
         """
