@@ -9,12 +9,12 @@ class MediaResponse(NamedTuple):
 
 
 class BaseClient:
-    def __init__(self, access_token, version="v21.0"):
+    def __init__(self, access_token, version="v24.0"):
         """
         Base client for WhatsApp API.
 
         :param access_token: Meta API access token
-        :param version: API version (default is v21.0)
+        :param version: API version (default is v24.0)
         """
         self.access_token = access_token
         self.base_url = f"https://graph.facebook.com/{version}/"
@@ -38,7 +38,10 @@ class BaseClient:
 
         url = endpoint if endpoint.startswith("http") else self.base_url + endpoint
 
-        response = requests.request(method, url, json=payload, headers=headers)
+        if method == "GET":
+            response = requests.request(method, url, params=payload, headers=headers)
+        else:
+            response = requests.request(method, url, json=payload, headers=headers)
 
         # If response successful, return the JSON response
         if response.status_code == 200:

@@ -5,7 +5,7 @@ from whatsapp_api.base_client import BaseClient
 
 
 class MediaClient(BaseClient):
-    def __init__(self, access_token, phone_number_id, version="v21.0"):
+    def __init__(self, access_token, phone_number_id, version="v24.0"):
         """
         Media client for WhatsApp.
 

@@ -5,7 +5,7 @@ from whatsapp_api.message.validation import validate_buttons, validate_list_mess
 
 
 class MessagingClient(BaseClient):
-    def __init__(self, access_token, phone_number_id, version="v21.0"):
+    def __init__(self, access_token, phone_number_id, version="v24.0"):
         """
         Messaging client for WhatsApp.
 
