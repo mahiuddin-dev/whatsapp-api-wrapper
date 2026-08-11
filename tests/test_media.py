@@ -136,7 +136,7 @@ class TestMediaClient(unittest.TestCase):
         mock_request.assert_called_once_with(
             "GET",
             f"{self.media_client.base_url}{media_id}?phone_number_id={self.phone_number_id}",
-            json=None,
+            params=None,
             headers={
                 "Authorization": f"Bearer {self.access_token}",
                 "Content-Type": "application/json",
@@ -162,7 +162,7 @@ class TestMediaClient(unittest.TestCase):
         mock_request.assert_called_once_with(
             "GET",
             media_url,
-            json=None,
+            params=None,
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
     # Download media from URL
@@ -187,7 +187,7 @@ class TestMediaClient(unittest.TestCase):
         mock_request.assert_called_once_with(
             "GET",
             media_url,
-            json=None,
+            params=None,
             headers={"Authorization": f"Bearer {self.access_token}"},
         )
 
